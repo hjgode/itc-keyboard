@@ -5,9 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CUSbKeysCStest", "CUSbKeysC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CUsbKeysCS", "CUsbKeysCS\CUsbKeysCS\CUsbKeysCS.csproj", "{FB6F4507-EAF7-4CFE-B282-13481C604DFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "keysetCk3kaufland", "keysetCk3kaufland\keysetCk3kaufland.csproj", "{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}"
-EndProject
 Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -24,12 +26,6 @@ Global
 		{FB6F4507-EAF7-4CFE-B282-13481C604DFE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{FB6F4507-EAF7-4CFE-B282-13481C604DFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB6F4507-EAF7-4CFE-B282-13481C604DFE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EA55AAF0-8E99-44D9-B428-7EEFBB782D6C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
