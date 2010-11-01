@@ -3,7 +3,7 @@
 = Introduction =
 
 Add your content here.
-
+This is my first try to edit the wiki via svn
 
 = Details =
 
