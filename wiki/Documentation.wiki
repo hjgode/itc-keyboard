@@ -1,16 +1,18 @@
-#summary One-sentence summary of this page.
+#summary An extended ITC keyboard remapper API (compact framework) class
 
 = Introduction =
 
-Add your content here.
-This is my first try to edit the wiki via svn
+ITC provides you the keyboard remap API within the device resource kit. This API is good to remap keys to produce
+simply other key messages. But as soon as you need to remap a key to produce special keys, you need to fiddle
+with the registry. For example you can not use the remap API to produce a sequence of keys or toggle key modifiers like CAPS lock or CTRL.
+This is the time where you may need this keyboard remapper class.
 
 = Details =
 
 Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+* Text in *bold* or _italic_
+* Headings, paragraphs, and lists
+* Automatic links to other wiki pages
 
 Wiki markup help
 =Heading1=
@@ -22,7 +24,7 @@ Wiki markup help
 escape: `*`
 
 Indent lists 2 spaces:
-  * bullet item
+* bullet item
   # numbered list
 
 {{{
