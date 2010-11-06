@@ -9,32 +9,7 @@ This is the time where you may need this keyboard remapper class.
 
 = Details =
 
-Add your content here.  Format your content with:
-* Text in *bold* or _italic_
-* Headings, paragraphs, and lists
-* Automatic links to other wiki pages
+For some more information see 
+[http://www.hjgode.de/wp/2010/11/06/itckeyboard-a-class-to-manage-itc-keyboard-mappings/ itc-keyboard at my blog]
 
-Wiki markup help
-=Heading1=
-==Heading2==
-===Heading3===
-
-*bold*     _italic_
-`inline code`
-escape: `*`
-
-Indent lists 2 spaces:
-* bullet item
-  # numbered list
-
-{{{
-verbatim code block
-}}}
-
-Horizontal rule
-----
-
-WikiWordLink
-[http://domain/page label]
-http://domain/page
-
+The classes and the code are documented inline. There is also a Doxygen generated help inside the svn doc directory.
