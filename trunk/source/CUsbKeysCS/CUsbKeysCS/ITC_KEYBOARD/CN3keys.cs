@@ -1,4 +1,4 @@
-namespace ITC_Keyboard
+namespace ITC_KEYBOARD
 {
     public static class cn3Keys
     {
