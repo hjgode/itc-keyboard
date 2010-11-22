@@ -43,6 +43,8 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         //KbdRemapCN50.cpl
         [DllImport("KbdRemapCN50.cpl", EntryPoint = "ITC_ResetKeyDefaults", CharSet = CharSet.Unicode)]
         private static extern int ITC_ResetKeyDefaultsCN50();
+        [DllImport("KbdRemapCS40.cpl", EntryPoint = "ITC_ResetKeyDefaults", CharSet = CharSet.Unicode)]
+        private static extern int ITC_ResetKeyDefaultsCS40();
 
         /*! \brief used for internal actual keyboard table
           
@@ -74,6 +76,14 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
 
         private CFunctionkeys _functionKeys;
 
+        /// <summary>
+        /// unfortunately the CN50 is very different
+        /// </summary>
+        private bool _isCN50 = false;
+        public bool isCN50
+        {
+            get { return _isCN50; }
+        }
         #region NOTE
         /* 
         NOTE:
@@ -207,13 +217,15 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                 }
                 if (CUsbKeyTypes.FlagsMid.isVkey(theUsbKeyStruct.bFlagMid))
                 {
-                    s += " '" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
+                    if(CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
+                        s += " SHIFT+'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
+                    else
+                        s += " '" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
                 }
                 else
-                {
-                    if(CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid)){
+                {//no VKEY
+                    if (CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
                         s += " SHIFT+'" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStruct.bIntScan) + "'";
-                    }
                     else
                         s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStruct.bIntScan) + "'";
                 }
@@ -265,6 +277,12 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
 
         public CUSBkeys()
         {
+            //check, if CN50 device
+            if (System.IO.File.Exists(@"\Windows\KbdRemapCN50.cpl"))
+                _isCN50 = true;
+            else
+                _isCN50 = false;
+
             try
             {
                 rotateKeys = new CRotateKeys();
@@ -345,6 +363,8 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                     iRes = ITC_ResetKeyDefaultsCN4();
                 if (System.IO.File.Exists(@"\Windows\KbdRemapCN50.cpl"))
                     iRes = ITC_ResetKeyDefaultsCN50();
+                if (System.IO.File.Exists(@"\Windows\KbdRemapCS40.cpl"))
+                    iRes = ITC_ResetKeyDefaultsCS40();
                 this.updateDriver();
 
             }
@@ -365,7 +385,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             for (int x = 0; x < getNumPlanes(); x++)
             {
                 s += "\r\n================================\r\n";
-                s += "ShiftPlane" + x.ToString() + "\r\n================================\r\n";
+                s += "ShiftPlane " + x.ToString() + "\r\n================================\r\n";
 
                 foreach (usbKeyStruct _UKS in _usbKeysAll[x])
                 {

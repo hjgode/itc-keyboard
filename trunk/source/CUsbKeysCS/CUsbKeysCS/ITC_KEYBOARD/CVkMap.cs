@@ -273,11 +273,11 @@ namespace ITC_KEYBOARD
                 new CvkMap ( 0x96,"undef 0x96" ),
                 new CvkMap ( 0x97,"undef 0x97" ),
                 new CvkMap ( 0x98,"undef 0x98" ),
-                new CvkMap ( 0x99,"undef 0x99" ),
+                new CvkMap ( 0x99,"0x99 (orange plane)" ),
                 new CvkMap ( 0x9A,"undef 0x9A" ),
                 new CvkMap ( 0x9B,"undef 0x9B" ),
-                new CvkMap ( 0x9C,"undef 0x9C" ),
-                new CvkMap ( 0x9D,"undef 0x9D" ),
+                new CvkMap ( 0x9C,"0x9C light" ),   // 0x9C controls the CN50 screen backlight
+                new CvkMap ( 0x9D,"0x9D (ok)" ),    // cn50 way of doing
                 new CvkMap ( 0x9E,"undef 0x9E" ),
                 new CvkMap ( 0x9F,"undef 0x9F" ),
                 new CvkMap ( 0xA0,"VK_LSHIFT" ),
@@ -346,7 +346,7 @@ namespace ITC_KEYBOARD
                 new CvkMap ( 0xDE,"VK_APOSTROPHE" ),
                 new CvkMap ( 0xDF,"VK_OFF" ),
                 new CvkMap ( 0xE0,"undef 0xE0" ),
-                new CvkMap ( 0xE1,"undef 0xE1" ),
+                new CvkMap ( 0xE1,"0xE1 (<scan>)" ), // see CN50 dumps
                 new CvkMap ( 0xE2,"VK_EXTEND_BSLASH" ),
                 new CvkMap ( 0xE3,"undef 0xE3" ),
                 new CvkMap ( 0xE4,"undef 0xE4" ),
@@ -540,7 +540,7 @@ namespace ITC_KEYBOARD
             undef_0x99,
             undef_0x9A,
             undef_0x9B,
-            undef_0x9C,
+            undef_0x9C_light, //0x9c controls screen backlight on CN50
             undef_0x9D,
             undef_0x9E,
             undef_0x9F,
@@ -609,7 +609,7 @@ namespace ITC_KEYBOARD
             VK_APOSTROPHE,
             VK_OFF,
             undef_0xE0,
-            undef_0xE1,
+            undef_0xE1_SCAN,
             VK_EXTEND_BSLASH,
             undef_0xE3,
             undef_0xE4,
