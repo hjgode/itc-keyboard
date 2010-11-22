@@ -9,7 +9,7 @@ namespace ITC_KEYBOARD
     /// <summary>
     /// Class to access the direct keyboard driver tables
     /// </summary>
-    public partial class CDirectKeys
+    public partial class CDirectKeys 
     {
         /*
         0x00 Virtual key (VK_)
@@ -131,6 +131,8 @@ namespace ITC_KEYBOARD
         /// <returns>count of key pairs</returns>
         public int getKeyCount()
         {
+            if (this._bDirectKeys == null)
+                return 0;
             return _bKeyPairs.Length;
         }
         /// <summary>
@@ -273,6 +275,8 @@ namespace ITC_KEYBOARD
         /// <returns>directKeysStruct[]</returns>
         private directKeyStruct[] RawDeserialize2(byte[] rawData)
         {
+            if (rawData == null)
+                return null;
             int structSize = 2;
             int iCount = rawData.Length / structSize; //we have 5 bytes per struct
             directKeyStruct[] _directKey = new directKeyStruct[iCount];

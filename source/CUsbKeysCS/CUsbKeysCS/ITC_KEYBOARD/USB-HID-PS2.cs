@@ -580,16 +580,21 @@ namespace ITC_KEYBOARD
             new Cusbps2key("Keyboard Locking Scroll Lock", 0x07, 0x84, 0xc000, NORMAL),
             new Cusbps2key("Keypad ,", 0x07, 0x85, 0xc000, NORMAL),
             new Cusbps2key("Keyboard Equal Sign", 0x07, 0x86, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 1", 0x07, 0x87, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 2", 0x07, 0x88, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 3", 0x07, 0x89, 0xc000, NORMAL),
-            new Cusbps2key("Action" /*"Keyboard Int値 4"*/, 0x07, 0x8A, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 5", 0x07, 0x8B, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 6", 0x07, 0x8C, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 7", 0x07, 0x8D, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 8", 0x07, 0x8E, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 9", 0x07, 0x8F, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Lang 1", 0x07, 0x90, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 1", 0x07, 0x87, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 2", 0x07, 0x88, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 3", 0x07, 0x89, 0xc000, NORMAL),
+            new Cusbps2key("Action" /*"Keyboard Intl 4"*/, 0x07, 0x8A, 0xc000, NORMAL),
+
+            new Cusbps2key("Aqua Plane", 0x07, 0x8B, 0xE002, EXTENDED),  //not verified
+            new Cusbps2key("Green Plane", 0x07, 0xB6, 0xE002, EXTENDED), //not verified
+            new Cusbps2key("Orange Plane", 0x07, 0xE9, 0xE001, EXTENDED),//not verified
+        	
+            new Cusbps2key("Keyboard Intl 5", 0x07, 0x8B, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 6", 0x07, 0x8C, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 7", 0x07, 0x8D, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 8", 0x07, 0x8E, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 9", 0x07, 0x8F, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Lang 1 (<SCAN>)", 0x07, 0x90, 0xc000, NORMAL),
             new Cusbps2key("Keyboard Lang 2", 0x07, 0x91, 0xc000, NORMAL),
             new Cusbps2key("Keyboard Lang 3", 0x07, 0x92, 0xc000, NORMAL),
             new Cusbps2key("Keyboard Lang 4", 0x07, 0x93, 0xc000, NORMAL),
@@ -625,10 +630,6 @@ namespace ITC_KEYBOARD
             new Cusbps2key("Right Alt", 0x07, 0xE6, 0xE011, EXTENDED),
             new Cusbps2key("Right GUI(OK)", 0x07, 0xE7, 0xE027, EXTENDED), //also known as (OK)
 
-            new Cusbps2key("Aqua Plane", 0x07, 0x8B, 0xE002, EXTENDED),  //not verified
-            new Cusbps2key("Green Plane", 0x07, 0xB6, 0xE002, EXTENDED), //not verified
-            new Cusbps2key("Orange Plane", 0x07, 0xE9, 0xE001, EXTENDED),//not verified
-        	
             new Cusbps2key("RESERVED", 0x07, 0xE8, 0xb000, NORMAL),
 	        new Cusbps2key("RESERVED", 0x07, 0xc000, 0xb000, NORMAL),
 	        new Cusbps2key(null, 0x00, 0x00, 0x00, NORMAL) //last marker
@@ -836,15 +837,15 @@ namespace ITC_KEYBOARD
             new Cusbps2key("Keyboard Locking Scroll Lock", 0x07, 0x84, 0xc000, NORMAL),
             new Cusbps2key("Keypad ,", 0x07, 0x85, 0xc000, NORMAL),
             new Cusbps2key("Keyboard Equal Sign", 0x07, 0x86, 0xc000, NORMAL),
-            new Cusbps2key("light/zero", 0x07, 0x87, 0xc000, NORMAL), // Keyboard Int値 1
-            new Cusbps2key("Keyboard Int値 2", 0x07, 0x88, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 3", 0x07, 0x89, 0xc000, NORMAL),
-            new Cusbps2key("Action" /*"Keyboard Int値 4"*/, 0x07, 0x8A, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 5", 0x07, 0x8B, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 6", 0x07, 0x8C, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 7", 0x07, 0x8D, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 8", 0x07, 0x8E, 0xc000, NORMAL),
-            new Cusbps2key("Keyboard Int値 9", 0x07, 0x8F, 0xc000, NORMAL),
+            new Cusbps2key("light/zero", 0x07, 0x87, 0xc000, NORMAL), // Keyboard Intl 1
+            new Cusbps2key("Keyboard Intl 2", 0x07, 0x88, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 3", 0x07, 0x89, 0xc000, NORMAL),
+            new Cusbps2key("Action" /*"Keyboard Intl 4"*/, 0x07, 0x8A, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 5", 0x07, 0x8B, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 6", 0x07, 0x8C, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 7", 0x07, 0x8D, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 8", 0x07, 0x8E, 0xc000, NORMAL),
+            new Cusbps2key("Keyboard Intl 9", 0x07, 0x8F, 0xc000, NORMAL),
             new Cusbps2key("center scan", 0x07, 0x90, 0xc000, NORMAL), //Keyboard Lang 1
             new Cusbps2key("lower left side", 0x07, 0x91, 0xc000, NORMAL), //Keyboard Lang 2
             new Cusbps2key("Keyboard Lang 3", 0x07, 0x92, 0xc000, NORMAL),

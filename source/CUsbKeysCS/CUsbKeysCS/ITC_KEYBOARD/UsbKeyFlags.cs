@@ -135,63 +135,63 @@ namespace ITC_KEYBOARD
 
             public static bool isNormalkey(usbFlagsHigh b)// byte b)
             {
-                if (b == usbFlagsHigh.NoFlag)
+                if ((b & usbFlagsHigh.NoFlag) == usbFlagsHigh.NoFlag)
                     return true;
                 else
                     return false;
             }
             public static bool isStickyOnce(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.StickyOnce)
+                if ((b & usbFlagsHigh.StickyOnce)== usbFlagsHigh.StickyOnce)
                     return true;
                 else
                     return false;
             }
             public static bool isStickyPersist(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.StickyPersist)
+                if ((b & usbFlagsHigh.StickyPersist) == usbFlagsHigh.StickyPersist)
                     return true;
                 else
                     return false;
             }
             public static bool isStickyLock(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.StickyLock)
+                if ((b & usbFlagsHigh.StickyLock) == usbFlagsHigh.StickyLock)
                     return true;
                 else
                     return false;
             }
             public static bool isReserved1(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.Reserved1)
+                if ((b & usbFlagsHigh.Reserved1) == usbFlagsHigh.Reserved1)
                     return true;
                 else
                     return false;
             }
             public static bool isLED1(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.LED1)
+                if ((b & usbFlagsHigh.LED1) == usbFlagsHigh.LED1)
                     return true;
                 else
                     return false;
             }
             public static bool isLED2(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.LED2)
+                if ((b & usbFlagsHigh.LED2)== usbFlagsHigh.LED2)
                     return true;
                 else
                     return false;
             }
             public static bool isLED3(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.LED3)
+                if ((b  & usbFlagsHigh.LED3) == usbFlagsHigh.LED3)
                     return true;
                 else
                     return false;
             }
             public static bool isReserved(usbFlagsHigh b)
             {
-                if (b == usbFlagsHigh.Reserved)
+                if ((b & usbFlagsHigh.Reserved)== usbFlagsHigh.Reserved)
                     return true;
                 else
                     return false;
@@ -215,14 +215,14 @@ namespace ITC_KEYBOARD
 
             public static bool isNormalkey(usbFlagsMid b) // byte b)
             {
-                if (b == usbFlagsMid.NoFlag)
+                if ((b & usbFlagsMid.NoFlag) == usbFlagsMid.NoFlag)
                     return true;
                 else
                     return false;
             }
             public static bool isExtendedKey(usbFlagsMid b)
             {
-                if (b == usbFlagsMid.Extended)
+                if ((b & usbFlagsMid.Extended) == usbFlagsMid.Extended)
                     return true;
                 else
                     return false;
@@ -250,21 +250,21 @@ namespace ITC_KEYBOARD
             }
             public static bool isNoop(usbFlagsMid b)
             {
-                if (b == usbFlagsMid.NOOP)
+                if ((b & usbFlagsMid.NOOP) == usbFlagsMid.NOOP)
                     return true;
                 else
                     return false;
             }
             public static bool isShifted(usbFlagsMid b)
             {
-                if ((b == usbFlagsMid.Shifted) || (b == (usbFlagsMid.VKEY|usbFlagsMid.Shifted)))
+                if ((b & usbFlagsMid.Shifted)  == usbFlagsMid.Shifted)
                     return true;
                 else
                     return false;
             }
             public static bool isNoChord(usbFlagsMid b)
             {
-                if (b == usbFlagsMid.NoChord)
+                if ((b & usbFlagsMid.NoChord) == usbFlagsMid.NoChord)
                     return true;
                 else
                     return false;
@@ -287,56 +287,56 @@ namespace ITC_KEYBOARD
 
             public static bool isNormalkey(CUsbKeyTypes.usbFlagsLow b)//( byte b)
             {
-                if (b == usbFlagsLow.NormalKey)// usbFlags1.NormalKey)
+                if ((b & usbFlagsLow.NormalKey) == usbFlagsLow.NormalKey)// usbFlags1.NormalKey)
                     return true;
                 else
                     return false;
             }
             public static bool isShiftKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.ShiftKeyIndex)
+                if ((b & usbFlagsLow.ShiftKeyIndex) == usbFlagsLow.ShiftKeyIndex)
                     return true;
                 else
                     return false;
             }
             public static bool isNamedEventKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.NamedEventIndex)
+                if ((b & usbFlagsLow.NamedEventIndex) == usbFlagsLow.NamedEventIndex)
                     return true;
                 else
                     return false;
             }
             public static bool isMultiKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.MultiKeyIndex)
+                if ((b & usbFlagsLow.MultiKeyIndex) == usbFlagsLow.MultiKeyIndex)
                     return true;
                 else
                     return false;
             }
             public static bool isModifierKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.ModifierIndex)
+                if ((b & usbFlagsLow.ModifierIndex) == usbFlagsLow.ModifierIndex)
                     return true;
                 else
                     return false;
             }
             public static bool isAppLaunchKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.AppLaunchKey)
+                if ((b & usbFlagsLow.AppLaunchKey) == usbFlagsLow.AppLaunchKey)
                     return true;
                 else
                     return false;
             }
             public static bool isFunctionKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.FunctionKeyIndex)
+                if ((b & usbFlagsLow.FunctionKeyIndex) == usbFlagsLow.FunctionKeyIndex)
                     return true;
                 else
                     return false;
             }
             public static bool isRotateKey(CUsbKeyTypes.usbFlagsLow b)
             {
-                if (b == usbFlagsLow.RotateKeyIndex)
+                if ((b & usbFlagsLow.RotateKeyIndex) == usbFlagsLow.RotateKeyIndex)
                     return true;
                 else
                     return false;
