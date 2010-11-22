@@ -218,7 +218,8 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                 if (CUsbKeyTypes.FlagsMid.isVkey(theUsbKeyStruct.bFlagMid))
                 {
                     if(CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
-                        s += " SHIFT+'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
+                        s += " SHIFT+'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "' '" +
+                            ITC_KEYBOARD.CvkMap.getNameShifted(theUsbKeyStruct.bIntScan) + "'";
                     else
                         s += " '" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
                 }
