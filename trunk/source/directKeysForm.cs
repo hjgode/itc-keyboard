@@ -17,9 +17,18 @@ namespace CUsbKeysCStest
         public directKeysForm()
         {
             InitializeComponent();
-
-            updateKeyList();
-            updateLists();
+            //test if direct keys are available
+            _directKeys = new CDirectKeys();
+            if (_directKeys.getKeyCount() == 0)
+            {
+                MessageBox.Show("No direct key definitions");
+                this.Close();
+            }
+            else
+            {
+                updateKeyList();
+                updateLists();
+            }
         }
 
         private void updateKeyList()
