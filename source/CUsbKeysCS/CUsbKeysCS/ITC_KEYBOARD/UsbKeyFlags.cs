@@ -243,7 +243,7 @@ namespace ITC_KEYBOARD
             }
             public static bool isVkey(usbFlagsMid b)
             {
-                if (b == usbFlagsMid.VKEY)
+                if ((b & usbFlagsMid.VKEY) == usbFlagsMid.VKEY)
                     return true;
                 else
                     return false;
@@ -257,7 +257,7 @@ namespace ITC_KEYBOARD
             }
             public static bool isShifted(usbFlagsMid b)
             {
-                if (b == usbFlagsMid.Shifted)
+                if ((b == usbFlagsMid.Shifted) || (b == (usbFlagsMid.VKEY|usbFlagsMid.Shifted)))
                     return true;
                 else
                     return false;
