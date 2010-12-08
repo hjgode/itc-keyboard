@@ -464,9 +464,9 @@ namespace ITC_KEYBOARD
             F2 = 0x3B,			/*!< F2 is equal to SoftKey2 on SmartPhone (see winuserm.h)!*/
             F3 = 0x3C,			/*!< F3 is equal to the Phone key (green key, start phone call) on SmartPhone (see winuserm.h)!*/
             F4 = 0x3D,			/*!< F4 is equal to Phone End key (red key, hangup) on SmartPhone (see winuserm.h)!*/
-            F5 = 0x3E,			/*!< F5 is equal to Volume Down key on SmartPhone (see winuserm.h)!*/
-            F6 = 0x3F,			/*!< F6 is equal to Volume Up key on SmartPhone (see winuserm.h)!*/
-            F7 = 0x40,			
+            F5 = 0x3E,			
+            F6_VOL_UP = 0x3F,	/*!< F6 is equal to Volume UP key on SmartPhone (see winuserm.h)!*/
+            F7_VOL_DN = 0x40,	/*!< F7 is equal to Volume DOWN key on SmartPhone (see winuserm.h)!*/		
             F8 = 0x41,
             F9 = 0x42,
             F10 = 0x43,
@@ -547,7 +547,7 @@ namespace ITC_KEYBOARD
             Keyboard_Intl_7 = 0x8D,
             Keyboard_Intl_8 = 0x8E,
             Keyboard_Intl_9 = 0x8F,
-            Keyboard_Lang_1 = 0x90,
+            SCAN_Button_KeyLang1 = 0x90,     // 'Keyboard_Lang_1'  used as Scan Button identifier
             Keyboard_Lang_2 = 0x91,
             Keyboard_Lang_3 = 0x92,
             Keyboard_Lang_4 = 0x93,
