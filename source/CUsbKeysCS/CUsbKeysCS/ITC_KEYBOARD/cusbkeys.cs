@@ -366,7 +366,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                     iRes = ITC_ResetKeyDefaultsCN50();
                 if (System.IO.File.Exists(@"\Windows\KbdRemapCS40.cpl"))
                     iRes = ITC_ResetKeyDefaultsCS40();
-                this.updateDriver();
+                iRes = this.updateDriver();
 
             }
             catch (Exception)
@@ -550,19 +550,31 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             return iIndex;
         }
 
-        private void updateDriver()
+        /// <summary>
+        /// Send the driver an event to let read the actual key tables 
+        /// </summary>
+        /// <returns>0 for success</returns>
+        private int updateDriver()
         {
             EventHandling.setNamedEvent("ITC_KEYBOARD_CHANGE_USB");
             uint iRes = 99;
             try
             {
                 iRes = EventNamespace.EventHandling.WaitForUsbLoadComplete();
+                System.Diagnostics.Debug.WriteLine("WaitForUsbLoadComplete = " + iRes.ToString());
             }
-            catch (Exception)
+            catch (ArgumentOutOfRangeException ax)
             {
-                System.Diagnostics.Debug.WriteLine("Exception in WaitForUsbLoadComplete");
+                System.Diagnostics.Debug.WriteLine("ArgumentOutOfRangeException in WaitForUsbLoadComplete" + ax.Message);
             }
-            System.Diagnostics.Debug.WriteLine("WaitForUsbLoadComplete = " + iRes.ToString());
+            catch (Exception x)
+            {
+                System.Diagnostics.Debug.WriteLine("Exception in WaitForUsbLoadComplete" + x.Message);
+            }
+            if (iRes != 0)
+                return -1;
+            else
+                return 0;
         }
 
         private int getEventCount()
@@ -781,6 +793,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         /// <returns>0 for OK, -1 for error</returns>
         public int writeKeyTables()
         {
+            int iRet=-99;
             int iPlaneCount = this.getNumPlanes();
             string regKeyb = getRegLocation();
             try
@@ -793,13 +806,16 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                     tempKey.SetValue("ShiftPlane" + p.ToString(), bRaw, Microsoft.Win32.RegistryValueKind.Binary);
                 }
                 tempKey.Close();
-                this.updateDriver();
+                if (this.updateDriver() == 0)
+                    iRet = 0;
+                else
+                    iRet = -1; //something wrent wrong
             }
             catch (Exception)
             {
-                return -1;
+                return -2; // we got an exception
             }
-            return 0;
+            return iRet;
         }
         /// <summary>
         /// save the key remapping table for keyboard plane iPlane to registry

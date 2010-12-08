@@ -133,9 +133,10 @@ namespace ITC_KEYBOARD
             public const byte LED3 = 0x40;
             public const byte Reserved = 0x80;
 
-            public static bool isNormalkey(usbFlagsHigh b)// byte b)
+            public static bool isNormalkey(usbFlagsHigh b)
             {
-                if ((b & usbFlagsHigh.NoFlag) == usbFlagsHigh.NoFlag)
+                byte _b = (byte)(b & usbFlagsHigh.NoFlag);
+                if (_b == (byte)usbFlagsHigh.NoFlag)
                     return true;
                 else
                     return false;
@@ -215,7 +216,8 @@ namespace ITC_KEYBOARD
 
             public static bool isNormalkey(usbFlagsMid b) // byte b)
             {
-                if ((b & usbFlagsMid.NoFlag) == usbFlagsMid.NoFlag)
+                byte _b = (byte)(b & usbFlagsMid.NoFlag);
+                if (_b == (byte)usbFlagsMid.NoFlag)
                     return true;
                 else
                     return false;
@@ -287,7 +289,8 @@ namespace ITC_KEYBOARD
 
             public static bool isNormalkey(CUsbKeyTypes.usbFlagsLow b)//( byte b)
             {
-                if ((b & usbFlagsLow.NormalKey) == usbFlagsLow.NormalKey)// usbFlags1.NormalKey)
+                byte _b = (byte)(b & usbFlagsLow.NormalKey);
+                if (_b == (byte)usbFlagsLow.NormalKey)// usbFlags1.NormalKey)
                     return true;
                 else
                     return false;

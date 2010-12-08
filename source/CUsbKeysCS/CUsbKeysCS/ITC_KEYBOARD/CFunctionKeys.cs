@@ -69,7 +69,7 @@ namespace ITC_KEYBOARD
         /// <summary>
         /// structure to hold the functionkey data
         /// </summary>
-        struct functionkeyStruct
+        public struct functionkeyStruct
         {
             public string DllName; /*!< the DLL name the function key is linked to*/
             public string DllFunction; /*!< the function inside the DLL the functionkey is linked to*/
@@ -84,7 +84,7 @@ namespace ITC_KEYBOARD
         /// <summary>
         /// a list of known function keys according to the registry
         /// </summary>
-        private List<functionkeyStruct> _functionkeyList;
+        private List<functionkeyStruct> _functionkeyList=new List<functionkeyStruct>();
 
         /// <summary>
         /// the number of functionkeys defined according to the registry
@@ -144,6 +144,7 @@ namespace ITC_KEYBOARD
         /// </summary>
         private void readAll()
         {
+            _functionkeyList.Clear();
             int iCount = this.getfunctionkeyCount();
             if (iCount == 0)
                 return;
@@ -190,6 +191,14 @@ namespace ITC_KEYBOARD
             sValue = "FunctionKey1Flags";
             tempKey.SetValue(sValue, uFlag, Microsoft.Win32.RegistryValueKind.DWord);
             tempKey.Close();
+        }
+        /// <summary>
+        /// return the list of known function keys
+        /// </summary>
+        /// <returns>a list of function key structs</returns>
+        public List<functionkeyStruct> functionKeys()
+        {
+            return this._functionkeyList;
         }
     }
 }
