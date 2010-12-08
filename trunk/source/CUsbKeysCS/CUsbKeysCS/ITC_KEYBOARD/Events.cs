@@ -198,6 +198,7 @@ namespace EventNamespace
         /// <returns>0 for success
         /// 1 for Abort Thread requested
         /// 2 for wait has timed out</returns>
+        /// <throws>ArgumentOutOfRangeException for failures</throws>
         public static uint WaitForUsbLoadComplete()
         {
             uint iState = 99;
