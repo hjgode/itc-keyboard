@@ -45,6 +45,8 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         private static extern int ITC_ResetKeyDefaultsCN50();
         [DllImport("KbdRemapCS40.cpl", EntryPoint = "ITC_ResetKeyDefaults", CharSet = CharSet.Unicode)]
         private static extern int ITC_ResetKeyDefaultsCS40();
+        [DllImport("KBDTools.CPL", EntryPoint = "ResetAll", CharSet = CharSet.Unicode)]
+        private static extern int ITC_ResetAllCN70();
 
         /*! \brief used for internal actual keyboard table
           
@@ -366,6 +368,9 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                     iRes = ITC_ResetKeyDefaultsCN50();
                 if (System.IO.File.Exists(@"\Windows\KbdRemapCS40.cpl"))
                     iRes = ITC_ResetKeyDefaultsCS40();
+                if (System.IO.File.Exists(@"\Windows\KBDTools.CPL"))
+                    iRes = ITC_ResetAllCN70();
+                
                 iRes = this.updateDriver();
 
             }
