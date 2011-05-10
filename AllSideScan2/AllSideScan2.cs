@@ -47,6 +47,7 @@ namespace AllSideScan2
             for (int iPlane = 0; iPlane < iCount; iPlane++) //do for all planes
             {
                 //remap F6 to NOOP
+                //new use: _cusbKeys.getKeyStruct(iPlane, HardwareKeys.CK70Keys.ITC_Standard_UpperRight_Btn, ref usbKey);
                 _cusbKeys.getKeyStruct(iPlane, ITC_KEYBOARD.CUsbKeyTypes.HWkeys.F6_VOL_UP, ref usbKey);
                 usbKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
                 usbKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NOOP;
