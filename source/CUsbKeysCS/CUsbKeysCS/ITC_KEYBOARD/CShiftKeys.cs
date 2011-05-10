@@ -182,7 +182,7 @@ namespace ITC_KEYBOARD
                 _ShiftKeyStructList.Add(bModifierKeys);
             }
             tempKey.Close();
-            System.Diagnostics.Debug.WriteLine("readall finished");
+            System.Diagnostics.Debug.WriteLine("ModifiersKeys readall finished");
         }
 
     }

@@ -171,7 +171,7 @@ namespace ITC_KEYBOARD
             }
 
             tempKey.Close();
-            System.Diagnostics.Debug.WriteLine("readall finished");
+            System.Diagnostics.Debug.WriteLine("FunctionKey readall finished");
         }
         /// <summary>
         /// a test function to fill the registry with a functionkey entry
