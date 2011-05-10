@@ -176,7 +176,7 @@ namespace ITC_KEYBOARD
                 _MultiKeyStructList.Add(bMultiKeys);
             }
             tempKey.Close();
-            System.Diagnostics.Debug.WriteLine("readall finished");
+            System.Diagnostics.Debug.WriteLine("MultiKeys readall finished");
         }
 
     }

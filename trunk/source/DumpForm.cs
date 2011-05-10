@@ -14,7 +14,7 @@ namespace CUsbKeysCStest
         {
             InitializeComponent();
             ITC_KEYBOARD.CUSBkeys _cusbKeys = new ITC_KEYBOARD.CUSBkeys();
-            textBox1.Text = _cusbKeys.dumpAllKeys();
+            textBox1.Text = _cusbKeys.dumpAllKeys().ToString();
         }
 
         private void mnuBack_Click(object sender, EventArgs e)

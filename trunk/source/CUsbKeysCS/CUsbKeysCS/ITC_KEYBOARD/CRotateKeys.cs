@@ -265,7 +265,7 @@ namespace ITC_KEYBOARD
                     _RotateShiftedCharsList.Add(s);
                 }
                 tempKey.Close();
-                System.Diagnostics.Debug.WriteLine("readall finished");
+                System.Diagnostics.Debug.WriteLine("RotateKey readall finished");
             }
             //TEST
             /// <summary>

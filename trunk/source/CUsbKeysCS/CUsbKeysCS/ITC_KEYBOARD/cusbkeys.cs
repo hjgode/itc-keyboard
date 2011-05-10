@@ -209,28 +209,36 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             //first dump the USB-HID name of the key
             s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getNameUSBHID(theUsbKeyStruct.bScanKey) + "' ";
 
+
             //the following must result in char @ ("shift"+"=")
             //07,8A,00,20,00,55-Keyboard Intl 4- '='
             if (CUsbKeyTypes.FlagsLow.isNormalkey(theUsbKeyStruct.bFlagLow))
             {
-                if (CUsbKeyTypes.FlagsMid.isExtendedKey(theUsbKeyStruct.bFlagMid))
+                if (CUsbKeyTypes.FlagsMid.isNoop(theUsbKeyStruct.bFlagMid))
                 {
-                    s += " extended:'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
-                }
-                if (CUsbKeyTypes.FlagsMid.isVkey(theUsbKeyStruct.bFlagMid))
-                {
-                    if(CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
-                        s += " SHIFT+'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "' '" +
-                            ITC_KEYBOARD.CvkMap.getNameShifted(theUsbKeyStruct.bIntScan) + "'";
-                    else
-                        s += " '" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
+                    s += "NOOP";
                 }
                 else
-                {//no VKEY
-                    if (CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
-                        s += " SHIFT+'" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStruct.bIntScan) + "'";
+                {
+                    if (CUsbKeyTypes.FlagsMid.isExtendedKey(theUsbKeyStruct.bFlagMid))
+                    {
+                        s += " extended:'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
+                    }
+                    if (CUsbKeyTypes.FlagsMid.isVkey(theUsbKeyStruct.bFlagMid))
+                    {
+                        if (CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
+                            s += " SHIFT+'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "' '" +
+                                ITC_KEYBOARD.CvkMap.getNameShifted(theUsbKeyStruct.bIntScan) + "'";
+                        else
+                            s += " '" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStruct.bIntScan) + "'";
+                    }
                     else
-                        s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStruct.bIntScan) + "'";
+                    {//no VKEY
+                        if (CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStruct.bFlagMid))
+                            s += " SHIFT+'" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStruct.bIntScan) + "'";
+                        else
+                            s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStruct.bIntScan) + "'";
+                    }
                 }
             }
 
@@ -296,6 +304,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             }
             //read all ShiftPlanes into local array
             this.readKeyTables();
+
             _KeybdNamedEvents = new CkeybNamedEvents(false);
             try
             {
@@ -385,18 +394,35 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         /// dump the meaning of all known key mappings
         /// </summary>
         /// <returns></returns>
-        public string dumpAllKeys()
+        public StringBuilder dumpAllKeys()
         {
-            String s="";
-            for (int x = 0; x < getNumPlanes(); x++)
+            StringBuilder s = new StringBuilder(4000);
+            //s="";
+            int iCount = getNumPlanes();
+            for (int x = 0; x < iCount; x++)
             {
-                s += "\r\n================================\r\n";
-                s += "ShiftPlane " + x.ToString() + "\r\n================================\r\n";
+                s.Append( "\r\n================================\r\n");
+                s.Append ("ShiftPlane " + x.ToString() + "\r\n================================\r\n");
 
                 foreach (usbKeyStruct _UKS in _usbKeysAll[x])
                 {
-                    s += dumpKey(_UKS);
-                    s += "\r\n";
+
+                    try
+                    {
+#if TEST
+                        if ((int)_UKS.bScanKey == 0x13)
+                        {
+                            System.Diagnostics.Debug.WriteLine(dumpKey(_UKS));
+                            System.Diagnostics.Debugger.Break();
+                        }
+#endif
+                        s.Append( dumpKey(_UKS));
+                        s.Append( "\r\n");
+                    }
+                    catch (Exception)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Exception for dumpKey: " + _UKS.bScanKey);
+                    }
                 }
             }
             return s;
