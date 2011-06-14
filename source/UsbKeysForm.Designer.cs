@@ -44,6 +44,7 @@ namespace CUsbKeysCStest
             this.btnNoop = new System.Windows.Forms.Button();
             this.btn_ModifierKey = new System.Windows.Forms.Button();
             this.btn_Functionkey = new System.Windows.Forms.Button();
+            this.mnu_UseITEtables = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // mainMenu1
@@ -60,6 +61,7 @@ namespace CUsbKeysCStest
             // 
             this.menuItem1.MenuItems.Add(this.mnuDumpKeys);
             this.menuItem1.MenuItems.Add(this.mnuResetDefault);
+            this.menuItem1.MenuItems.Add(this.mnu_UseITEtables);
             this.menuItem1.Text = "Options";
             // 
             // mnuDumpKeys
@@ -155,6 +157,11 @@ namespace CUsbKeysCStest
             this.btn_Functionkey.TabIndex = 18;
             this.btn_Functionkey.Text = "Function Key";
             // 
+            // mnu_UseITEtables
+            // 
+            this.mnu_UseITEtables.Text = "use ITE tables";
+            this.mnu_UseITEtables.Click += new System.EventHandler(this.mnu_UseITEtables_Click);
+            // 
             // UsbKeysForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -194,5 +201,6 @@ namespace CUsbKeysCStest
         private System.Windows.Forms.Button btnNoop;
         private System.Windows.Forms.Button btn_ModifierKey;
         private System.Windows.Forms.Button btn_Functionkey;
+        private System.Windows.Forms.MenuItem mnu_UseITEtables;
     }
 }
