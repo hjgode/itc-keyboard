@@ -27,7 +27,10 @@ namespace CUsbKeysCStest
             if (_cusb != null)
             {
                 _cusb = null;
-                _cusb = new CUSBkeys();
+                if (mnu_UseITEtables.Checked)
+                    _cusb = new CUSBkeys(true);
+                else
+                    _cusb = new CUSBkeys();
             }
             fillForm();
         }
@@ -142,6 +145,14 @@ namespace CUsbKeysCStest
             ModifierKeysForm mf = new ModifierKeysForm();
             mf.ShowDialog();
             mf.Dispose();
+        }
+
+        private void mnu_UseITEtables_Click(object sender, EventArgs e)
+        {
+            mnu_UseITEtables.Checked = !mnu_UseITEtables.Checked;
+            if (mnu_UseITEtables.Checked)
+            {
+            }
         }
     }
 }
