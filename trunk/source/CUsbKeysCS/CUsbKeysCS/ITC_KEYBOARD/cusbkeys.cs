@@ -48,6 +48,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         [DllImport("KBDTools.CPL", EntryPoint = "ResetAll", CharSet = CharSet.Unicode)]
         private static extern int ITC_ResetAllCN70();
 
+        private static Boolean _bUseITEtables = false;
         /*! \brief used for internal actual keyboard table
           
             _usbKeys holds an array of all defined keys of the keyboard mapping
@@ -286,6 +287,64 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             return s;
         }
 
+        public CUSBkeys(Boolean bUseITEtables)
+        {
+            if (bUseITEtables)
+                _bUseITEtables = true;
+            else
+                _bUseITEtables = false;
+
+            //check, if CN50 device
+            if (System.IO.File.Exists(@"\Windows\KbdRemapCN50.cpl"))
+                _isCN50 = true;
+            else
+                _isCN50 = false;
+
+            try
+            {
+                rotateKeys = new CRotateKeys();
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("No RotateKeys defined");
+            }
+            //read all ShiftPlanes into local array
+
+            _KeybdNamedEvents = new CkeybNamedEvents(false);
+            try
+            {
+                _MultiKeys = new CMultiKeys();
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("No MultiKeys supported");
+            }
+            try
+            {
+                _ModifiersKeys = new CModifiersKeys();
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("No ModifiersKeys supported");
+            }
+            try
+            {
+                _shiftKeys = new CShiftKeys();
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("No ShiftKeys supported");
+            }
+            try
+            {
+                _functionKeys = new CFunctionkeys();
+            }
+            catch (Exception)
+            {
+                System.Diagnostics.Debug.WriteLine("No FunctionKeys supported");
+            }
+        }
+
         public CUSBkeys()
         {
             //check, if CN50 device
@@ -340,10 +399,35 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             }
         }
 
-        private void readKeyTables()
+        private void readKeyTablesITE()
         {
             int iCount = getNumPlanes();
             string regKeyb = getRegLocation();
+            _usbKeysAll = new usbKeyStruct[iCount][];
+            Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
+            for (int x = 0; x < iCount; x++)
+            {
+                byte[] bKeys = (byte[])tempKey.GetValue("ShiftPlane" + x.ToString());
+
+                usbKeyStruct[] _usbKeyTemp = RawDeserialize2(bKeys);
+
+                //_usbKeysAll=new CUSBkeys2.usbKey[x][];
+                //_usbKeysAll[x] = new usbKey[_usbKeyTemp.Length];
+                _usbKeysAll[x] = _usbKeyTemp;
+
+            }
+            tempKey.Close();
+        }
+        private void readKeyTables()
+        {
+            int iCount = getNumPlanes();
+            string regKeyb;
+            
+            if(_bUseITEtables)
+                regKeyb=getRegLocationITE();
+            else
+                regKeyb = getRegLocation();
+
             _usbKeysAll = new usbKeyStruct[iCount][];
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
             for (int x = 0; x < iCount; x++)
@@ -657,7 +741,30 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             // [HKLM]Hardware\DeviceMap\Keybd:CurrentActiveLayoutKey
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"Hardware\DeviceMap\Keybd");
             string regKeyb = (string)tempKey.GetValue("CurrentActiveLayoutKey");
+            if (_bUseITEtables)
+            {
+                //TE2000LayoutAlias
+                Microsoft.Win32.RegistryKey tempKeyITE = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb);
+                string regKeybITE = (string)tempKeyITE.GetValue("TE2000LayoutAlias");
+
+                regKeyb = regKeybITE;
+                tempKeyITE.Close();
+            }
             tempKey.Close();
+            return regKeyb;
+        }
+        public static string getRegLocationITE()
+        {
+            // [HKLM]Hardware\DeviceMap\Keybd:CurrentActiveLayoutKey
+            Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"Hardware\DeviceMap\Keybd");
+            string regKeyb = (string)tempKey.GetValue("CurrentActiveLayoutKey");
+            //TE2000LayoutAlias
+            Microsoft.Win32.RegistryKey tempKeyITE = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb);
+            string regKeybITE = (string)tempKeyITE.GetValue("TE2000LayoutAlias");
+
+            regKeyb = regKeybITE;
+            tempKey.Close();
+            tempKeyITE.Close();
             return regKeyb;
         }
         /// <summary>
