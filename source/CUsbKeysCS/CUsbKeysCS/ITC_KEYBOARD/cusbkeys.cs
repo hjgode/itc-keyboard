@@ -48,7 +48,20 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         [DllImport("KBDTools.CPL", EntryPoint = "ResetAll", CharSet = CharSet.Unicode)]
         private static extern int ITC_ResetAllCN70();
 
-        private static Boolean _bUseITEtables = false;
+        private Boolean _bUseITEtables = false;
+        public Boolean useITEtables
+        {
+            get { return _bUseITEtables; }
+            set
+            {
+                if (_bUseITEtables != value)
+                {
+                    _bUseITEtables = value;
+                    readKeyTablesITE();
+                }
+            }
+                    
+        }
         /*! \brief used for internal actual keyboard table
           
             _usbKeys holds an array of all defined keys of the keyboard mapping
@@ -309,6 +322,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                 System.Diagnostics.Debug.WriteLine("No RotateKeys defined");
             }
             //read all ShiftPlanes into local array
+            this.readKeyTables();
 
             _KeybdNamedEvents = new CkeybNamedEvents(false);
             try
@@ -352,6 +366,9 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                 _isCN50 = true;
             else
                 _isCN50 = false;
+
+            //set ITE flag
+            this._bUseITEtables = false;
 
             try
             {
@@ -736,12 +753,12 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         /// get the active registry key for the keyboard driver mapping
         /// </summary>
         /// <returns>a string with the registry location of the current mapping</returns>
-        public static string getRegLocation()
+        public static string getRegLocation(bool bUseITEtable)
         {
             // [HKLM]Hardware\DeviceMap\Keybd:CurrentActiveLayoutKey
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"Hardware\DeviceMap\Keybd");
             string regKeyb = (string)tempKey.GetValue("CurrentActiveLayoutKey");
-            if (_bUseITEtables)
+            if (bUseITEtable)
             {
                 //TE2000LayoutAlias
                 Microsoft.Win32.RegistryKey tempKeyITE = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb);
@@ -753,6 +770,18 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             tempKey.Close();
             return regKeyb;
         }
+        /// <summary>
+        /// get the active registry key for the keyboard driver mapping
+        /// </summary>
+        /// <returns>a string with the registry location of the current mapping</returns>
+        public static string getRegLocation()
+        {
+            // [HKLM]Hardware\DeviceMap\Keybd:CurrentActiveLayoutKey
+            Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"Hardware\DeviceMap\Keybd");
+            string regKeyb = (string)tempKey.GetValue("CurrentActiveLayoutKey");
+            tempKey.Close();
+            return regKeyb;
+        }
         public static string getRegLocationITE()
         {
             // [HKLM]Hardware\DeviceMap\Keybd:CurrentActiveLayoutKey
@@ -761,7 +790,12 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             //TE2000LayoutAlias
             Microsoft.Win32.RegistryKey tempKeyITE = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb);
             string regKeybITE = (string)tempKeyITE.GetValue("TE2000LayoutAlias");
-
+            if (regKeybITE == null)
+            {
+                tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"Hardware\DeviceMap\Keybd");              
+                byte[] regKeybITEStruct = (byte[])tempKey.GetValue("TEUSBTranslateTable");
+            }
+            
             regKeyb = regKeybITE;
             tempKey.Close();
             tempKeyITE.Close();

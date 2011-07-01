@@ -14,7 +14,7 @@ namespace CUsbKeysCStest
         CUSBkeys _cusb;
         CUsbHwKeys _cusbhwkeys;
         vkPair[] vkPairs;
-        
+        private bool oldITEstatus = false;
         public UsbKeysForm()
         {
             InitializeComponent();
@@ -28,9 +28,21 @@ namespace CUsbKeysCStest
             {
                 _cusb = null;
                 if (mnu_UseITEtables.Checked)
-                    _cusb = new CUSBkeys(true);
+                {
+                    if (oldITEstatus != true)
+                    {
+                        _cusb = new CUSBkeys(true);
+                        oldITEstatus = true;
+                    }
+                }
                 else
-                    _cusb = new CUSBkeys();
+                {
+                    if (oldITEstatus != false)
+                    {
+                        _cusb = new CUSBkeys();
+                        oldITEstatus = false;
+                    }
+                }
             }
             fillForm();
         }
@@ -152,6 +164,8 @@ namespace CUsbKeysCStest
             mnu_UseITEtables.Checked = !mnu_UseITEtables.Checked;
             if (mnu_UseITEtables.Checked)
             {
+                _cusb.useITEtables = true;
+                refreshData();
             }
         }
     }
