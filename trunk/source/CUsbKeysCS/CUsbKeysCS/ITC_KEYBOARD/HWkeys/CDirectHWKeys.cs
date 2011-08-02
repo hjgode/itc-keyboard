@@ -5,7 +5,7 @@ using System.Text;
 namespace ITC_KEYBOARD
 {
     /// <summary>
-    /// calss to provide lists of directKey hardware key codes
+    /// class to provide lists of directKey hardware key codes
     /// </summary>
     public partial class CDirectHWKeys
     {
@@ -45,6 +45,10 @@ namespace ITC_KEYBOARD
             {
                 string s = ITC_Tools.getModelNumber();
                 _vkPairs=ck3directHWKeys.vkPairs;
+            }
+            else if (sPlatform.StartsWith("7"))
+            {
+                _vkPairs=i700directHWKeys.vkPairs;
             }
         }
     }
