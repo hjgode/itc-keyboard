@@ -69,15 +69,20 @@ namespace ITC_KEYBOARD
         public string dumpModifierKey(int iIdx)
         {
             byte[] bs = _ModifierKeyStructList[iIdx - 1];
-            CUSBkeys.usbKeyStructShort[] rs = RawDeserialize2(bs);
+            CUSBkeys.usbKeyStructShort rs = RawDeserialize2(bs);
             string s = "->";
-            for (int i = 0; i < rs.Length; i++)
-            {
-                s += dumpModifierKey(rs[i]);
-            }
+            s += dumpModifierKey(rs);
             return s;
         }
 
+        public CUSBkeys.usbKeyStructShort getModifiersKey(int idx)
+        {
+            int iMax = getModifierKeyCount(); 
+            if (idx > iMax)
+                return new CUSBkeys.usbKeyStructShort();
+            return _ModifierKeyStructs[idx];
+
+        }
         /// <summary>
         /// an array to hold ModifiersKeys as found in registry
         /// </summary>
@@ -132,7 +137,7 @@ namespace ITC_KEYBOARD
         /// </summary>
         /// <param name="rawData">the bytes as read from registry</param>
         /// <returns>array of ModifierKeyStruct</returns>
-        private static CUSBkeys.usbKeyStructShort[] RawDeserialize2(byte[] rawData)
+        private static CUSBkeys.usbKeyStructShort RawDeserialize2(byte[] rawData)
         {
             int structSize = 4;
             int iCount = rawData.Length / structSize; //we have 4 bytes per struct
@@ -144,7 +149,7 @@ namespace ITC_KEYBOARD
                 _multiStruct[i].bFlagLow = (CUsbKeyTypes.usbFlagsLow)rawData[i * structSize + 2];
                 _multiStruct[i].bIntScan = rawData[i * structSize + 3];
             }
-            return _multiStruct;
+            return _multiStruct[0]; //return first struct only
         }
         /// <summary>
         /// get the number of defined ModifierKeys as readable from registry
@@ -189,15 +194,50 @@ namespace ITC_KEYBOARD
             string regKeyb = CUSBkeys.getRegLocation() + @"\ModifiersKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
 
+            _ModifierKeyStructs = new CUSBkeys.usbKeyStructShort[iCount]; //create a new list
 
-            for (int i = 1; i <= iCount; i++)
+            for (int i = 0; i < iCount; i++)
             {
-                byte[] bModifierKeys = (byte[])tempKey.GetValue("ModKey" + i.ToString());
-                _ModifierKeyStructs = RawDeserialize2(bModifierKeys);
+                byte[] bModifierKeys = (byte[])tempKey.GetValue("ModKey" + (i+1).ToString());
+                //we will have only one keystruct in modifiers
+                _ModifierKeyStructs[i] = RawDeserialize2(bModifierKeys);
+
                 _ModifierKeyStructList.Add(bModifierKeys);
             }
             tempKey.Close();
             System.Diagnostics.Debug.WriteLine("ModifiersKeys readall finished");
+        }
+        public int findModifierKey(CUSBkeys.usbKeyStructShort modKey)
+        {
+            int iRet = -1; //not found
+            int iMax = this.getModifierKeyCount();
+            int iFound = -1;
+            CUSBkeys.usbKeyStructShort mStruct;
+            for (int i = 0; i < iMax; i++)
+            {
+                mStruct = this.getModifiersKey(i);
+                if (mStruct.Equals(modKey))
+                    iRet = i+1;
+            }
+            return iRet;
+        }
+
+        public int addModifierKey(CUSBkeys.usbKeyStructShort modKey)
+        {
+            int iMax = getModifierKeyCount();
+            CUSBkeys.usbKeyStructShort[] bTemp = new CUSBkeys.usbKeyStructShort[1];
+            bTemp[0] = modKey;
+            byte[] bNew = this.RawSerialize(bTemp);
+            
+            //add a new multikeyentry
+            string regKeyb = CUSBkeys.getRegLocation() + @"\ModifiersKeys";
+            Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
+
+            tempKey.SetValue("ModKey" + (iMax + 1).ToString(), bNew, Microsoft.Win32.RegistryValueKind.Binary);
+            //reread all
+            readAll();
+
+            return iMax + 1;
         }
 
     }
