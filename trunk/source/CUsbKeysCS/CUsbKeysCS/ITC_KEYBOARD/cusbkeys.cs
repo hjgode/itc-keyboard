@@ -750,6 +750,50 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             return sDeltaEvents;
         }
         /// <summary>
+        /// read the multikey entries from registry
+        /// </summary>
+        /// <returns>a string array with the names of the delta events</returns>
+        public string[] getMultiKeys()
+        {
+            string sRegMultikeys = getRegLocation() + @"\Multikeys";
+            //the events are below this in branches called Events\State and Events\Delta
+            //open the State branch
+            Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(sRegMultikeys, true);
+            //the keys are 'numbered' Event1 to Eventx
+            int iValCount = tempKey.ValueCount;
+            string[] sMultikeys = new string[iValCount];
+            for (int i = 0; i < iValCount; i++)
+            {
+                string sEventVal = "Multi" + (i + 1).ToString();
+                sMultikeys[i] = (string)tempKey.GetValue(sEventVal).ToString();
+            }
+            tempKey.Close();
+            return sMultikeys;
+        }
+        /// <summary>
+        /// read the modifiers from registry
+        /// </summary>
+        /// <returns>a string array with the names of the delta events</returns>
+        public string[] getModifiersKeys()
+        {
+            string sRegMultikeys = getRegLocation() + @"\ModifiersKeys";
+            //the events are below this in branches called Events\State and Events\Delta
+            //open the State branch
+            Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(sRegMultikeys, true);
+            //the keys are 'numbered' Event1 to Eventx
+            int iValCount = tempKey.ValueCount;
+            string[] sMultikeys = new string[iValCount];
+            for (int i = 0; i < iValCount; i++)
+            {
+                string sEventVal = "ModKey" + (i + 1).ToString();
+                sMultikeys[i] = (string)tempKey.GetValue(sEventVal);
+            }
+            tempKey.Close();
+            return sMultikeys;
+        }
+
+
+        /// <summary>
         /// get the active registry key for the keyboard driver mapping
         /// </summary>
         /// <returns>a string with the registry location of the current mapping</returns>
@@ -1219,6 +1263,18 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             Bit 22: 40,00,00: LED 3 (Key lights SCOLL LOCK LED when depressed)
             Bit 23: 80,00,00: Reserved         
          */
+        public static usbKeyStructShort controlModKey
+        {
+            get
+            {
+                CUSBkeys.usbKeyStructShort uKey = new CUSBkeys.usbKeyStructShort();
+                uKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce;
+                uKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                uKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
+                uKey.bIntScan = 0x14;//USBHID.LeftControl = 0xE0 ABER LEFT_CONTROL=0x14
+                return uKey;
+            }
+        }
     }
 
 }

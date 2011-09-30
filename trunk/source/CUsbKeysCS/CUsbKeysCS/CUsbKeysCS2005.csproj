@@ -64,6 +64,7 @@
     <Compile Include="ITC_KEYBOARD\cusbkeys.cs" />
     <Compile Include="ITC_KEYBOARD\CVkMap.cs" />
     <Compile Include="ITC_KEYBOARD\Events.cs" />
+    <Compile Include="ITC_KEYBOARD\HWkeys\7xxdirectkeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CDirectHWKeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CK3directHWKeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CK3keys-retail.cs" />
