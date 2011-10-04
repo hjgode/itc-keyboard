@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace FunctionKeys2ControlKeysCF2
+namespace FunctionKeys2ControlKeys
 {
     public partial class MapFKeysToCtrlKeys : Form
     {

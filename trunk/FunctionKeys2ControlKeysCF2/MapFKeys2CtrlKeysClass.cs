@@ -4,7 +4,7 @@ using System.Text;
 
 using ITC_KEYBOARD;
 
-namespace FunctionKeys2ControlKeysCF2
+namespace FunctionKeys2ControlKeys
 {
     class MapFKeys2CtrlKeysClass
     {

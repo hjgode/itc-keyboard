@@ -2,19 +2,19 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{064887B9-3F0C-44FA-8CC7-40EAA74BAD84}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FunctionKeys2ControlKeysCF2</RootNamespace>
-    <AssemblyName>FunctionKeys2ControlKeysCF2</AssemblyName>
+    <RootNamespace>FunctionKeys2ControlKeys</RootNamespace>
+    <AssemblyName>FunctionKeys2ControlKeys</AssemblyName>
     <ProjectTypeGuids>{4D628B5B-2FBC-4AA6-8C16-197242AEB884};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PlatformFamilyName>PocketPC</PlatformFamilyName>
-    <PlatformID>4118C335-430C-497f-BE48-11C3316B135E</PlatformID>
-    <OSVersion>5.01</OSVersion>
-    <DeployDirSuffix>FunctionKeys2ControlKeysCF2</DeployDirSuffix>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <PlatformID>2AC76CE7-3E8C-402d-85E7-AE9C98D7B6BA</PlatformID>
+    <OSVersion>5.02</OSVersion>
+    <DeployDirSuffix>FunctionKeys2ControlKeys</DeployDirSuffix>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FormFactorID>
     </FormFactorID>
     <FileUpgradeFlags>
@@ -22,7 +22,8 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
-    <NativePlatformName>Windows Mobile 5.0 Pocket PC SDK</NativePlatformName>
+    <NativePlatformName>Windows Mobile 6.5.3 Professional DTK</NativePlatformName>
+    <StartupObject>FunctionKeys2ControlKeys.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,9 +84,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\source\CUsbKeysCS\CUsbKeysCS\CUsbKeysCS2005.csproj">
+    <ProjectReference Include="..\source\CUsbKeysCS\CUsbKeysCS\CUsbKeysCS2008.csproj">
       <Project>{FB6F4507-EAF7-4CFE-B282-13481C604DFE}</Project>
-      <Name>CUsbKeysCS2005</Name>
+      <Name>CUsbKeysCS2008</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Condition="'$(TargetFrameworkVersion)' == 'v1.0'" Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.v1.targets" />

@@ -1,4 +1,4 @@
-namespace FunctionKeys2ControlKeysCF2
+namespace FunctionKeys2ControlKeys
 {
     partial class MapFKeysToCtrlKeys
     {
