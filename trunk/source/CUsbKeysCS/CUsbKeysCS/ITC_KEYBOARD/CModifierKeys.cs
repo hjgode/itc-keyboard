@@ -149,7 +149,7 @@ namespace ITC_KEYBOARD
                 _multiStruct[i].bFlagLow = (CUsbKeyTypes.usbFlagsLow)rawData[i * structSize + 2];
                 _multiStruct[i].bIntScan = rawData[i * structSize + 3];
             }
-            return _multiStruct[0]; //return first struct only
+            return _multiStruct[0]; //return first struct only, there should be only one struct
         }
         /// <summary>
         /// get the number of defined ModifierKeys as readable from registry
@@ -211,7 +211,6 @@ namespace ITC_KEYBOARD
         {
             int iRet = -1; //not found
             int iMax = this.getModifierKeyCount();
-            int iFound = -1;
             CUSBkeys.usbKeyStructShort mStruct;
             for (int i = 0; i < iMax; i++)
             {

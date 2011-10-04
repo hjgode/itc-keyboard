@@ -53,8 +53,17 @@ namespace ITC_KEYBOARD
                 bOut[3] = bIntScan;
                 return bOut;
             }
-        }
-        /// <summary>
+            public CUSBkeys.usbKeyStructShort toUsbKeyStructShort()
+            {
+                CUSBkeys.usbKeyStructShort usbShort= new CUSBkeys.usbKeyStructShort();
+                usbShort.bFlagHigh= (CUsbKeyTypes.usbFlagsHigh)bFlagHigh;
+                usbShort.bFlagMid = (CUsbKeyTypes.usbFlagsMid)bFlagMid;
+                usbShort.bFlagLow = (CUsbKeyTypes.usbFlagsLow)bFlagLow;
+                usbShort.bIntScan = bIntScan;
+                return usbShort;
+            }
+       }
+       /// <summary>
         /// gives a text dump reprensentation of the multikey
         /// </summary>
         /// <param name="_theBytes">the MultiKeyStruct to dump</param>
@@ -103,6 +112,30 @@ namespace ITC_KEYBOARD
             }
             iResult = _MultiKeys[idx].Length;
             return _MultiKeys[idx];// _MultiKeyStructs[idx];
+        }
+
+        /// <summary>
+        /// get a multikey[] list as usbKeyStructShort
+        /// </summary>
+        /// <param name="idx">index of items to return</param>
+        /// <param name="iResult">number of returned items</param>
+        /// <returns></returns>
+        public ITC_KEYBOARD.CUSBkeys.usbKeyStructShort[] getStructsShort(int idx, ref int iResult)
+        {
+            if (idx > getMultiKeyCount()){
+                iResult = -1;
+                return new CUSBkeys.usbKeyStructShort[0];
+            }
+            iResult = _MultiKeys[idx].Length;
+
+            //copy struct
+            CUSBkeys.usbKeyStructShort[] usbKeys= new CUSBkeys.usbKeyStructShort[_MultiKeys[idx].Length];
+            for (int j = 0; j < iResult; j++)
+            {
+                usbKeys[j]= _MultiKeys[idx][j].toUsbKeyStructShort();
+            }
+
+            return usbKeys;
         }
         public CMultiKeys()
         {

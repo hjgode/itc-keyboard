@@ -33,11 +33,14 @@ namespace FunctionKeys2ControlKeysCF2
             this.menuItem1 = new System.Windows.Forms.MenuItem();
             this.btnMapKeys = new System.Windows.Forms.Button();
             this.btnRestoreDefaults = new System.Windows.Forms.Button();
+            this.mnuOptions = new System.Windows.Forms.MenuItem();
+            this.mnuDump = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
             // 
             // mainMenu1
             // 
             this.mainMenu1.MenuItems.Add(this.menuItem1);
+            this.mainMenu1.MenuItems.Add(this.mnuOptions);
             // 
             // menuItem1
             // 
@@ -62,6 +65,16 @@ namespace FunctionKeys2ControlKeysCF2
             this.btnRestoreDefaults.Text = "Restore Defaults";
             this.btnRestoreDefaults.Click += new System.EventHandler(this.btnRestoreDefaults_Click);
             // 
+            // mnuOptions
+            // 
+            this.mnuOptions.MenuItems.Add(this.mnuDump);
+            this.mnuOptions.Text = "Options";
+            // 
+            // mnuDump
+            // 
+            this.mnuDump.Text = "Dump Keys";
+            this.mnuDump.Click += new System.EventHandler(this.mnuDump_Click);
+            // 
             // MapFKeysToCtrlKeys
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -83,6 +96,8 @@ namespace FunctionKeys2ControlKeysCF2
         private System.Windows.Forms.MenuItem menuItem1;
         private System.Windows.Forms.Button btnMapKeys;
         private System.Windows.Forms.Button btnRestoreDefaults;
+        private System.Windows.Forms.MenuItem mnuOptions;
+        private System.Windows.Forms.MenuItem mnuDump;
     }
 }
 
