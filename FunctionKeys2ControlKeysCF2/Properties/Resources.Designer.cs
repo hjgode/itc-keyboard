@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace FunctionKeys2ControlKeysCF2.Properties {
+namespace FunctionKeys2ControlKeys.Properties {
     using System;
     
     
@@ -36,7 +36,7 @@ namespace FunctionKeys2ControlKeysCF2.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FunctionKeys2ControlKeysCF2.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FunctionKeys2ControlKeys.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

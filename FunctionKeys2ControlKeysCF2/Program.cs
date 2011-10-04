@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace FunctionKeys2ControlKeysCF2
+namespace FunctionKeys2ControlKeys
 {
     static class Program
     {
