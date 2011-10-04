@@ -32,5 +32,12 @@ namespace FunctionKeys2ControlKeysCF2
             _usbKeys.resetKeyDefaults();
             _usbKeys.writeKeyTables();
         }
+
+        private void mnuDump_Click(object sender, EventArgs e)
+        {
+            ITC_KEYBOARD.DumpForm frm = new ITC_KEYBOARD.DumpForm();
+            frm.ShowDialog();
+            frm.Dispose();
+        }
     }
 }

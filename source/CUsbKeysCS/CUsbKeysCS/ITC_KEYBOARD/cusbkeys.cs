@@ -196,6 +196,118 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                 return "key with " + iHWScanCode.ToString("X") + " undefined";
         }
 
+        public string dumpFlags(usbKeyStruct usbStruct)
+        {
+            usbKeyStructShort usbTest = new usbKeyStructShort();
+            usbTest.bFlagHigh = usbStruct.bFlagHigh;
+            usbTest.bFlagMid = usbStruct.bFlagMid;
+            usbTest.bFlagLow = usbStruct.bFlagLow;
+            return dumpFlags(usbTest);
+        }
+
+        public string dumpFlags(usbKeyStructShort uShort)
+        {
+            string s2 = "[";
+            s2 += uShort.bFlagHigh.ToString() + ",";
+            s2 += uShort.bFlagMid.ToString() + ",";
+            s2 += uShort.bFlagLow.ToString() + ",";
+            s2 += "]";
+            return s2;
+        }
+        public string dumpKey(usbKeyStructShort theUsbKeyStructShort)
+        {
+            byte b;
+            string s = "";
+
+            b = (byte)theUsbKeyStructShort.bFlagHigh;
+            s += "," + b.ToString("X02");
+
+
+            b = (byte)theUsbKeyStructShort.bFlagMid;
+            s += "," + b.ToString("X02");
+
+            b = (byte)theUsbKeyStructShort.bFlagLow;
+            s += "," + b.ToString("X02");
+
+            s += "," + theUsbKeyStructShort.bIntScan.ToString("X02");
+            string s2 = dumpFlags(theUsbKeyStructShort);
+            s += s2;
+
+            //the following must result in char @ ("shift"+"=")
+            //07,8A,00,20,00,55-Keyboard Intl 4- '='
+            if (CUsbKeyTypes.FlagsLow.isNormalkey(theUsbKeyStructShort.bFlagLow))
+            {
+                if (CUsbKeyTypes.FlagsMid.isNoop(theUsbKeyStructShort.bFlagMid))
+                {
+                    s += "NOOP";
+                }
+                else
+                {
+                    if (CUsbKeyTypes.FlagsMid.isExtendedKey(theUsbKeyStructShort.bFlagMid))
+                    {
+                        s += " extended:'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStructShort.bIntScan) + "'";
+                    }
+                    if (CUsbKeyTypes.FlagsMid.isVkey(theUsbKeyStructShort.bFlagMid))
+                    {
+                        if (CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStructShort.bFlagMid))
+                            s += " SHIFT+'" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStructShort.bIntScan) + "' '" +
+                                ITC_KEYBOARD.CvkMap.getNameShifted(theUsbKeyStructShort.bIntScan) + "'";
+                        else
+                            s += " '" + ITC_KEYBOARD.CvkMap.getName(theUsbKeyStructShort.bIntScan) + "'";
+                    }
+                    else
+                    {//no VKEY
+                        if (CUsbKeyTypes.FlagsMid.isShifted(theUsbKeyStructShort.bFlagMid))
+                            s += " SHIFT+'" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStructShort.bIntScan) + "'";
+                        else
+                            s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(theUsbKeyStructShort.bIntScan) + "'";
+                    }
+                }
+            }
+
+
+            //if (CUsbKeyTypes.FlagsLow.isShiftKey(theUsbKeyStructShort.bFlagLow))
+            //{
+            //    s += " 'ShiftIndex'";
+            //    if (_shiftKeys != null)
+            //        s += _shiftKeys.dumpShiftKey(theUsbKeyStructShort.bIntScan);
+            //}
+            //if (CUsbKeyTypes.FlagsLow.isRotateKey(theUsbKeyStructShort.bFlagLow))
+            //{
+            //    s += " 'RotateIndex'";
+            //    if (rotateKeys != null)
+            //        s += rotateKeys.dumpRotateKey(theUsbKeyStructShort.bIntScan);
+            //}
+            //if (CUsbKeyTypes.FlagsLow.isNamedEventKey(theUsbKeyStructShort.bFlagLow))
+            //{
+            //    s += " 'EventIndex'";
+            //    string es = _KeybdNamedEvents.getStateEvent(theUsbKeyStructShort.bIntScan);
+            //    string ed = _KeybdNamedEvents.getDeltaEvent(theUsbKeyStructShort.bIntScan);
+            //    s += "|'" + es + "'|'" + ed;
+            //}
+            //if (CUsbKeyTypes.FlagsLow.isAppLaunchKey(theUsbKeyStructShort.bFlagLow))
+            //    s += " 'AppLaunch'";
+            //if (CUsbKeyTypes.FlagsLow.isFunctionKey(theUsbKeyStructShort.bFlagLow))
+            //{
+            //    s += " 'FunctionKey'";
+            //    if (_functionKeys != null)
+            //        s += _functionKeys.dumpFunctionkey(theUsbKeyStructShort.bIntScan);
+            //}
+            //if (CUsbKeyTypes.FlagsLow.isModifierKey(theUsbKeyStructShort.bFlagLow))
+            //{
+            //    s += " 'ModifierKey'";
+            //    if (_ModifiersKeys != null)
+            //        s += _ModifiersKeys.dumpModifierKey(theUsbKeyStructShort.bIntScan);
+
+            //}
+            //if (CUsbKeyTypes.FlagsLow.isMultiKey(theUsbKeyStructShort.bFlagLow))
+            //{
+            //    s += " 'MultiIndex'";
+            //    if (_MultiKeys != null)
+            //        s += _MultiKeys.dumpMultiKey(theUsbKeyStructShort.bIntScan);
+            //}
+            return s;
+        }
         /// <summary>
         /// deliver a string with the setting of the key
         /// </summary>
@@ -223,6 +335,8 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             //first dump the USB-HID name of the key
             s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getNameUSBHID(theUsbKeyStruct.bScanKey) + "' ";
 
+            string s2 = dumpFlags(theUsbKeyStruct);
+            s += s2;
 
             //the following must result in char @ ("shift"+"=")
             //07,8A,00,20,00,55-Keyboard Intl 4- '='
@@ -526,6 +640,74 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                     }
                 }
             }
+            //dump Modifiers
+            CModifiersKeys cmods = new CModifiersKeys();
+            s.Append( "\r\n================================\r\n");
+            s.Append(     "          ModifierKeys");
+            s.Append("\r\n================================\r\n");
+            int iModifierCount=cmods.getModifierKeyCount();
+            for (int i = 0; i < iModifierCount; i++)
+            {
+                try
+                {
+                    s.Append(dumpKey(cmods.getModifiersKey(i)));
+                    s.Append("\r\n");
+                }
+                catch (Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine("Exception for dumpKey Modifier Index: " + i.ToString());
+                }
+            }
+
+            s.Append( "\r\n================================\r\n");
+            s.Append(     "          MultiKeys");
+            s.Append("\r\n================================\r\n");
+            CMultiKeys cmulti = new CMultiKeys();
+            int iMultikeyCount = cmulti.getMultiKeyCount();
+            for (int i = 0; i < iMultikeyCount; i++)
+            {
+                s.Append("MultiKey" + (i+1).ToString() + ": ");
+                try
+                {
+                    int iRes=0;
+                    usbKeyStructShort[] multiStruct = cmulti.getStructsShort(i, ref iRes);
+                    for (int j = 0; j < multiStruct.Length; j++)
+                    {
+                        s.Append (dumpKey(multiStruct[j]));
+                        s.Append(" + ");
+                    }
+                }
+                catch (Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine("Exception for dumpKey Multikey Index: " + i.ToString());
+                }
+                s.Append("\r\n");
+            }
+
+            s.Append( "\r\n================================\r\n");
+            s.Append(     "          ShiftKeys");
+            s.Append("\r\n================================\r\n");
+            CShiftKeys cShiftKeys = new CShiftKeys();
+            int iShiftKeycount = cShiftKeys.getShiftKeyCount();
+            for (int i = 0; i < iShiftKeycount; i++)
+            {
+                try
+                {
+                    s.Append(dumpKey(cShiftKeys.getShiftKey(i)));
+                    s.Append("\r\n");
+                }
+                catch (Exception)
+                {
+                    System.Diagnostics.Debug.WriteLine("Exception for dumpKey Modifier Index: " + i.ToString());
+                }
+            }
+
+            s.Append( "\r\n================================\r\n");
+            s.Append(     "          Reg Location");
+            s.Append("\r\n================================\r\n");
+            s.Append(CUSBkeys.getRegLocation());
+            s.Append("\r\n");
+
             return s;
         }
         /// <summary>
@@ -1263,6 +1445,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             Bit 22: 40,00,00: LED 3 (Key lights SCOLL LOCK LED when depressed)
             Bit 23: 80,00,00: Reserved         
          */
+
         public static usbKeyStructShort controlModKey
         {
             get
@@ -1271,7 +1454,57 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
                 uKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce;
                 uKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
                 uKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
-                uKey.bIntScan = 0x14;//USBHID.LeftControl = 0xE0 ABER LEFT_CONTROL=0x14
+
+                uKey.bIntScan = 0x14;//a PS/2 key CUSBPS2_vals.Cusbps2key.getName(0x14)="Left Control"
+                return uKey;
+            }
+        }
+        public static usbKeyStructShort ModKeyLeftControl
+        {
+            get
+            {
+                CUSBkeys.usbKeyStructShort uKey = new CUSBkeys.usbKeyStructShort();
+                uKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce;
+                uKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                uKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
+
+                uKey.bIntScan = 0x14;//a PS/2 key CUSBPS2_vals.Cusbps2key.getName(0x14)="Left Control"
+                return uKey;
+            }
+        }
+        public static usbKeyStructShort ModKeyRightShift
+        {
+            get
+            {
+                CUSBkeys.usbKeyStructShort uKey = new CUSBkeys.usbKeyStructShort();
+                uKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce;
+                uKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                uKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
+                uKey.bIntScan = 0x59;//a PS/2 key CUSBPS2_vals.Cusbps2key.getName(0x59)="Right Shift"
+                return uKey;
+            }
+        }
+        public static usbKeyStructShort ModKeyLeftAlt
+        {
+            get
+            {
+                CUSBkeys.usbKeyStructShort uKey = new CUSBkeys.usbKeyStructShort();
+                uKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyLock | CUsbKeyTypes.usbFlagsHigh.LED1;
+                uKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                uKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
+                uKey.bIntScan = 0x11;//a PS/2 key CUSBPS2_vals.Cusbps2key.getName(0x11)="Left Alt"
+                return uKey;
+            }
+        }
+        public static usbKeyStructShort ModKeyCapsLock
+        {
+            get
+            {
+                CUSBkeys.usbKeyStructShort uKey = new CUSBkeys.usbKeyStructShort();
+                uKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce;
+                uKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                uKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
+                uKey.bIntScan = 0x58;//a PS/2 key CUSBPS2_vals.Cusbps2key.getName(0x58)="Caps Lock"
                 return uKey;
             }
         }

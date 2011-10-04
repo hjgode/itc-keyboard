@@ -12,7 +12,7 @@ namespace ITC_KEYBOARD
     {
         public CUSBkeys.usbKeyStructShort ShiftKeyStruct;
         ///// <summary>
-        ///// a Modifierkeystruct is similar to an USBKeyStruct except to that
+        ///// a ShiftKeys is similar to an USBKeyStruct except to that
         ///// it does not have an USB code page and USB HID scancode
         ///// </summary>
         //[Serializable]
@@ -66,16 +66,13 @@ namespace ITC_KEYBOARD
         public string dumpShiftKey(int iIdx)
         {
             byte[] bs = _ShiftKeyStructList[iIdx - 1];
-            CUSBkeys.usbKeyStructShort[] rs = RawDeserialize2(bs);
+            CUSBkeys.usbKeyStructShort rs = RawDeserialize2(bs);
             string s = "->";
-            for (int i = 0; i < rs.Length; i++)
-            {
-                s += dumpShiftKey(rs[i]);
-            }
+            s += dumpShiftKey(rs);
             return s;
         }
 
-        private CUSBkeys.usbKeyStructShort[] _ModifierKeyStructs;
+        private CUSBkeys.usbKeyStructShort[] _ShiftKeyStructs;
 
         private int _shiftKeyCount = 0;
         private List<byte[]> _ShiftKeyStructList;
@@ -83,9 +80,9 @@ namespace ITC_KEYBOARD
         public CShiftKeys()
         {
             //read number of entries
-            int iCount = this.getModifierKeyCount();
+            int iCount = this.getShiftKeyCount();
             if (iCount == 0)
-                throw new ArgumentNullException("Sorry, no ModifierKeys supported");
+                throw new ArgumentNullException("Sorry, no ShiftKeys supported");
             //create new arrays
             _ShiftKeyStructList=new List<byte[]>(iCount+1);
             this.readAll();
@@ -117,7 +114,7 @@ namespace ITC_KEYBOARD
         /// </summary>
         /// <param name="rawData">the bytes as read from registry</param>
         /// <returns>array of ModifierKeyStruct</returns>
-        private static CUSBkeys.usbKeyStructShort[] RawDeserialize2(byte[] rawData)
+        private static CUSBkeys.usbKeyStructShort RawDeserialize2(byte[] rawData)
         {
             int structSize = 4;
             int iCount = rawData.Length / structSize; //we have 4 bytes per struct
@@ -129,16 +126,24 @@ namespace ITC_KEYBOARD
                 _multiStruct[i].bFlagLow = (CUsbKeyTypes.usbFlagsLow)rawData[i * structSize + 2];
                 _multiStruct[i].bIntScan = rawData[i * structSize + 3];
             }
-            return _multiStruct;
+            return _multiStruct[0]; //return first struct only, there should be only one struct
         }
+
+        public CUSBkeys.usbKeyStructShort getShiftKey(int idx)
+        {
+            int iMax = getShiftKeyCount();
+            if (idx > iMax)
+                return new CUSBkeys.usbKeyStructShort();
+            return _ShiftKeyStructs[idx];
+
+        }
+
         /// <summary>
         /// get the number of defined ModifierKeys as readable from registry
         /// </summary>
         /// <returns>the number of ModifierKeys</returns>
-        public int getModifierKeyCount()
+        public int getShiftKeyCount()
         {
-            if (this._shiftKeyCount != 0)
-                return this._shiftKeyCount;
             string regKeyb = CUSBkeys.getRegLocation() + @"\ShiftKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
             int i = 1;
@@ -157,6 +162,8 @@ namespace ITC_KEYBOARD
                 if(o!=null)
                     i++;
             } while (o!=null);
+
+            _shiftKeyCount = i-1;
             if (i != 0)
                 return i - 1;
             else
@@ -165,24 +172,24 @@ namespace ITC_KEYBOARD
 
         private void readAll()
         {
-            int iCount = this.getModifierKeyCount();
+            int iCount = this.getShiftKeyCount();
             if (iCount == 0)
                 return;
             //read all ModifierKeys entries
-            _ModifierKeyStructs = new CUSBkeys.usbKeyStructShort[iCount];
+            _ShiftKeyStructs = new CUSBkeys.usbKeyStructShort[iCount];
 
-            string regKeyb = CUSBkeys.getRegLocation() + @"\ModifiersKeys";
+            string regKeyb = CUSBkeys.getRegLocation() + @"\ShiftKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
 
 
-            for (int i = 1; i <= iCount; i++)
+            for (int i = 0; i < iCount; i++)
             {
-                byte[] bModifierKeys = (byte[])tempKey.GetValue("ModKey" + i.ToString());
-                _ModifierKeyStructs = RawDeserialize2(bModifierKeys);
+                byte[] bModifierKeys = (byte[])tempKey.GetValue("ShiftKey" + (i+1).ToString());
+                _ShiftKeyStructs[i] = RawDeserialize2(bModifierKeys);
                 _ShiftKeyStructList.Add(bModifierKeys);
             }
             tempKey.Close();
-            System.Diagnostics.Debug.WriteLine("ModifiersKeys readall finished");
+            System.Diagnostics.Debug.WriteLine("ShiftKeys readall finished");
         }
 
     }
