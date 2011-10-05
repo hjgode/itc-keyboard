@@ -62,13 +62,11 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             }
                     
         }
-        /*! \brief used for internal actual keyboard table
-          
+        /*! \brief used for internal actual keyboard table          
             _usbKeys holds an array of all defined keys of the keyboard mapping
-
             \warning Do not use any more, is replaced by _usbKeysAll
         */
-	[Obsolete]
+	    [Obsolete]
         private usbKeyStruct[] _usbKeys=null;
         /// <summary>
         /// a var to hold rotate key definitions

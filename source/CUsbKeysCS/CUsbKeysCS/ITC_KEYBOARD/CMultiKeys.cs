@@ -11,18 +11,20 @@ namespace ITC_KEYBOARD
     public class CMultiKeys
     {
         
-        private MultiKeyStruct[] _MultiKeyStructs;
+        //private MultiKeyStruct[] _MultiKeyStructs;
+        private CUSBkeys.usbKeyStructShort[] _MultiKeyStructs;
 
         private int _multiKeyCount = 0;
         private List<byte[]> _MultiKeyStructList;
 
-        private MultiKeyStruct[][] _MultiKeys;
-        
+        //private MultiKeyStruct[][] _MultiKeys;
+        private CUSBkeys.usbKeyStructShort[][] _MultiKeys;
 
         /// <summary>
         /// a Multikeystruct is similar to an USBKeyStruct except to that
         /// it does not have an USB code page and USB HID scancode
         /// </summary>
+        [Obsolete("Please use CUSBkeys.usbKeyStructShort instead")]
         [Serializable]
         [StructLayout(LayoutKind.Sequential)]
         public struct MultiKeyStruct
@@ -66,9 +68,9 @@ namespace ITC_KEYBOARD
        /// <summary>
         /// gives a text dump reprensentation of the multikey
         /// </summary>
-        /// <param name="_theBytes">the MultiKeyStruct to dump</param>
+        /// <param name="_theBytes">the CUSBkeys.usbKeyStructShort to dump</param>
         /// <returns>a string with the meanings of the structure</returns>
-        public string dumpMultiKey(MultiKeyStruct _theBytes)
+        public string dumpMultiKey(CUSBkeys.usbKeyStructShort _theBytes)
         {
             string s = _theBytes.bFlagLow.ToString("X02");
             s += "," + _theBytes.bFlagMid.ToString("X02");
@@ -83,12 +85,12 @@ namespace ITC_KEYBOARD
         /// <summary>
         /// gives a text dump reprensentation of the multikey
         /// </summary>
-        /// <param name="iIdx">the index of the MultiKeyStruct to dump</param>
+        /// <param name="iIdx">the index of the CUSBkeys.usbKeyStructShort to dump</param>
         /// <returns>a string with the meanings of the structure</returns>
         public string dumpMultiKey(int iIdx)
         {
             byte[] bs = _MultiKeyStructList[iIdx - 1];
-            MultiKeyStruct[] rs = RawDeserialize2(bs);
+            CUSBkeys.usbKeyStructShort[] rs = RawDeserialize2(bs);
             string s = "->";
             for (int i = 0; i < rs.Length; i++)
             {
@@ -104,11 +106,11 @@ namespace ITC_KEYBOARD
         /// <param name="iResult">-1 = error
         /// positive values = number of structs returned</param>
         /// <returns>a number of structs</returns>
-        public MultiKeyStruct[] getMultiKey(int idx, ref int iResult)
+        public CUSBkeys.usbKeyStructShort[] getMultiKey(int idx, ref int iResult)
         {
             if (idx > getMultiKeyCount()){
                 iResult = -1;
-                return new MultiKeyStruct[0];
+                return new CUSBkeys.usbKeyStructShort[0];
             }
             iResult = _MultiKeys[idx].Length;
             return _MultiKeys[idx];// _MultiKeyStructs[idx];
@@ -132,7 +134,7 @@ namespace ITC_KEYBOARD
             CUSBkeys.usbKeyStructShort[] usbKeys= new CUSBkeys.usbKeyStructShort[_MultiKeys[idx].Length];
             for (int j = 0; j < iResult; j++)
             {
-                usbKeys[j]= _MultiKeys[idx][j].toUsbKeyStructShort();
+                usbKeys[j]= _MultiKeys[idx][j];
             }
 
             return usbKeys;
@@ -148,12 +150,12 @@ namespace ITC_KEYBOARD
             this.readAll();
         }
         /// <summary>
-        /// converts an array of MultiKeyStruct to a byte array for
+        /// converts an array of CUSBkeys.usbKeyStructShort to a byte array for
         /// storing into registry
         /// </summary>
         /// <param name="structData">the array to convert</param>
         /// <returns>a byte array ready to save to registry</returns>
-        public byte[] RawSerialize(MultiKeyStruct[] structData)
+        public byte[] RawSerialize(CUSBkeys.usbKeyStructShort[] structData)
         {
             //size
             int structSize = Marshal.SizeOf(structData[0]);
@@ -161,29 +163,29 @@ namespace ITC_KEYBOARD
             byte[] rawDatas = new byte[iRawSize];
             for (int i = 0; i < structData.Length; i++)
             {
-                rawDatas[(i * structSize) + 0] = structData[i].bFlagHigh;
-                rawDatas[(i * structSize) + 1] = structData[i].bFlagMid;
-                rawDatas[(i * structSize) + 2] = structData[i].bFlagLow;
-                rawDatas[(i * structSize) + 3] = structData[i].bIntScan;
+                rawDatas[(i * structSize) + 0] = (byte) structData[i].bFlagHigh;
+                rawDatas[(i * structSize) + 1] = (byte) structData[i].bFlagMid;
+                rawDatas[(i * structSize) + 2] = (byte) structData[i].bFlagLow;
+                rawDatas[(i * structSize) + 3] = (byte) structData[i].bIntScan;
             }
             return rawDatas;
         }
         /// <summary>
         /// converts a byte arrray as read from registry
-        /// to an array of MultiKeyStruct
+        /// to an array of CUSBkeys.usbKeyStructShort
         /// </summary>
         /// <param name="rawData">the bytes as read from registry</param>
-        /// <returns>array of MultiKeyStruct</returns>
-        private static MultiKeyStruct[] RawDeserialize2(byte[] rawData)
+        /// <returns>array of CUSBkeys.usbKeyStructShort</returns>
+        private static CUSBkeys.usbKeyStructShort[] RawDeserialize2(byte[] rawData)
         {
             int structSize = 4;
             int iCount = rawData.Length / structSize; //we have 4 bytes per struct
-            MultiKeyStruct[] _multiStruct = new MultiKeyStruct[iCount];
+            CUSBkeys.usbKeyStructShort[] _multiStruct = new CUSBkeys.usbKeyStructShort[iCount];
             for (int i = 0; i < iCount; i++)
             {
-                _multiStruct[i].bFlagHigh = rawData[i * structSize + 0];
-                _multiStruct[i].bFlagMid = rawData[i * structSize + 1];
-                _multiStruct[i].bFlagLow = rawData[i * structSize + 2];
+                _multiStruct[i].bFlagHigh = (CUsbKeyTypes.usbFlagsHigh)rawData[i * structSize + 0];
+                _multiStruct[i].bFlagMid = (CUsbKeyTypes.usbFlagsMid)rawData[i * structSize + 1];
+                _multiStruct[i].bFlagLow = (CUsbKeyTypes.usbFlagsLow)rawData[i * structSize + 2];
                 _multiStruct[i].bIntScan = rawData[i * structSize + 3];
             }
             return _multiStruct;
@@ -226,20 +228,20 @@ namespace ITC_KEYBOARD
             if (iCount == 0)
                 return;
             //read all MultiKeys entries
-            _MultiKeyStructs = new MultiKeyStruct[iCount];
+            _MultiKeyStructs = new CUSBkeys.usbKeyStructShort[iCount];
 
             string regKeyb = CUSBkeys.getRegLocation() + @"\MultiKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
 
-            _MultiKeys = new MultiKeyStruct[iCount][];
+            _MultiKeys = new CUSBkeys.usbKeyStructShort[iCount][];
             for (int i = 0; i < iCount; i++)
             {
                 byte[] bMultiKeys = (byte[])tempKey.GetValue("Multi" + (i+1).ToString());
                 int bCount = bMultiKeys.Length / 4;
 
-                MultiKeyStruct[] currentStruct= new MultiKeyStruct[bCount];
+                CUSBkeys.usbKeyStructShort[] currentStruct= new CUSBkeys.usbKeyStructShort[bCount];
 
-                _MultiKeys[i] = new MultiKeyStruct[bCount];
+                _MultiKeys[i] = new CUSBkeys.usbKeyStructShort[bCount];
 
                 _MultiKeyStructs = RawDeserialize2(bMultiKeys);
                 _MultiKeyStructList.Add(bMultiKeys);
@@ -253,7 +255,7 @@ namespace ITC_KEYBOARD
             System.Diagnostics.Debug.WriteLine("MultiKeys readall finished");
         }
 
-        public int findMultiKey(MultiKeyStruct[] multiKeys)
+        public int findMultiKey(CUSBkeys.usbKeyStructShort[] multiKeys)
         {
             //try to find existing MultiKey
             //CMultiKeys cmulti = new CMultiKeys();
@@ -262,7 +264,7 @@ namespace ITC_KEYBOARD
             int iResult = 0;
             int compareCount = 0;
             //find existing entries for multikey
-            CMultiKeys.MultiKeyStruct[] mStruct;
+            CUSBkeys.usbKeyStructShort[] mStruct;
             for (int i = 0; i < iMax; i++)
             {
                 compareCount = 0;
@@ -285,14 +287,18 @@ namespace ITC_KEYBOARD
             }
             return iFound;
         }
-        public int addMultiKey(MultiKeyStruct[] multiKeys)
+
+        /// <summary>
+        /// add a new reg entry for a multikey
+        /// </summary>
+        /// <param name="multiKeys">an array of key entries</param>
+        /// <returns>index of new entry or -1 on failure</returns>
+        public int addMultiKey(CUSBkeys.usbKeyStructShort[] multiKeys)
         {
             int iMax = getMultiKeyCount();
             byte[] bNew = new byte[multiKeys.Length*4];
-            for (int j = 0; j < multiKeys.Length; j++)
-            {
-                Array.Copy(multiKeys[j].toByteArray(), 0, bNew, j * 4, 4);
-            }
+            //copy the bytes to a flat byte array
+            bNew = RawSerialize(multiKeys);
             //add a new multikeyentry
             string regKeyb = CUSBkeys.getRegLocation() + @"\MultiKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
