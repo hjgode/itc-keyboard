@@ -39,5 +39,12 @@ namespace FunctionKeys2ControlKeys
             frm.ShowDialog();
             frm.Dispose();
         }
+
+        private void mnuRestore_Click(object sender, EventArgs e)
+        {
+            ITC_KEYBOARD.CUSBkeys _usbKeys = new ITC_KEYBOARD.CUSBkeys();
+            _usbKeys.resetKeyDefaults();
+            _usbKeys.writeKeyTables();            
+        }
     }
 }
