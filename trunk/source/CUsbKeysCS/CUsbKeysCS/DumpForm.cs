@@ -13,9 +13,11 @@ namespace ITC_KEYBOARD
         public DumpForm()
         {
             InitializeComponent();
+            Cursor.Current = Cursors.WaitCursor;
             ITC_KEYBOARD.CUSBkeys _cusbKeys = new ITC_KEYBOARD.CUSBkeys();
             string sReg = ITC_KEYBOARD.CUSBkeys.getRegLocation();
             textBox1.Text = sReg + "\r\n" + _cusbKeys.dumpAllKeys().ToString();
+            Cursor.Current = Cursors.Default;
         }
 
         private void mnuBack_Click(object sender, EventArgs e)
