@@ -8,7 +8,12 @@ namespace FunctionKeys2ControlKeys
 {
     class MapFKeys2CtrlKeysClass
     {
-        ITC_KEYBOARD.CUSBkeys _cusbKeys = new CUSBkeys();
+        ITC_KEYBOARD.CUSBkeys _cusbKeys;
+
+        public MapFKeys2CtrlKeysClass()
+        {
+            _cusbKeys = new CUSBkeys();
+        }
 
         /// <summary>
         /// map the function keys:
@@ -28,11 +33,13 @@ namespace FunctionKeys2ControlKeys
         /// </summary>
         public void createMultiKeys()
         {
+            CUsbKeyTypes.HWkeys[] keysToMap = new CUsbKeyTypes.HWkeys[] { CUsbKeyTypes.HWkeys.one, CUsbKeyTypes.HWkeys.two, CUsbKeyTypes.HWkeys.three, CUsbKeyTypes.HWkeys.four };
+
             //get Ctrl Modifier Key
             int iCtrlIdx = findCtrlModifier();
 
             //read the multikeys
-            string[] multikeys = _cusbKeys.getMultiKeys();
+            //string[] multikeys = _cusbKeys.getMultiKeys();
 
             //Multi3    = 00 00 08 02;                     00 08 00 14
             //          = NoFlag,NoFlag,ModIdx, 0x02;      NoFlag,VKey,NormalKey,0x14 (VK_CAPITAL)
@@ -50,6 +57,7 @@ namespace FunctionKeys2ControlKeys
             //prepare a new multikey entry
             CUSBkeys.usbKeyStructShort[] uKey = new CUSBkeys.usbKeyStructShort[2];
 
+            //map to modifier key 
             uKey[0].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
             uKey[0].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
             uKey[0].bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
@@ -73,15 +81,13 @@ namespace FunctionKeys2ControlKeys
             //now map the key in question to the new/existing MultiKeyEntry in all planes
             //CUSBkeys.usbKeyStruct remapKey = new CUSBkeys.usbKeyStruct();
 
+            //############### map 2 key #####################
             //map 1 key in orange or aqua/green plane to new multikey
-            setKeyToMultiKey((int)CUsbKeyTypes.HWkeys.one, (byte)iFound, cPlanes.plane.orange);
+            setKeyToMultiKey((int)keysToMap[0], (byte)iFound, cPlanes.plane.orange);
 
             //############### do the same with 2 key #####################
 
             //map to 'X', the first part of uKey remains the same
-            uKey[1].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            uKey[1].bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
             uKey[1].bIntScan = (int)ITC_KEYBOARD.PS2KEYS.X; // 0x22; 
             //is this key sequence (Ctrl + X) already defined
             iFound = cmulti.findMultiKey(uKey);
@@ -90,14 +96,11 @@ namespace FunctionKeys2ControlKeys
                 iFound = cmulti.addMultiKey(uKey);
             }
             //map 2 key in ornage or aqua/green plane to new multikey
-            setKeyToMultiKey((int)CUsbKeyTypes.HWkeys.two, (byte)iFound, cPlanes.plane.orange);
+            setKeyToMultiKey((int)keysToMap[1], (byte)iFound, cPlanes.plane.orange);
 
-            //############### do the same with F key #####################
+            //############### do the same with 3 key #####################
 
             //map to 'E', the first part of uKey remains the same
-            uKey[1].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            uKey[1].bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
             uKey[1].bIntScan = (int)ITC_KEYBOARD.PS2KEYS.E; 
             //is this key sequence (Ctrl + E) already defined
             iFound = cmulti.findMultiKey(uKey);
@@ -107,14 +110,11 @@ namespace FunctionKeys2ControlKeys
             }
 
             //map 3 key in ornage or aqua/green plane to new multikey
-            setKeyToMultiKey((int)CUsbKeyTypes.HWkeys.three, (byte)iFound, cPlanes.plane.orange);
+            setKeyToMultiKey((int)keysToMap[2], (byte)iFound, cPlanes.plane.orange);
 
             //############### do the same with 4 key #####################
 
             //map to 'P', the first part of uKey remains the same
-            uKey[1].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            uKey[1].bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
             uKey[1].bIntScan = (int)ITC_KEYBOARD.PS2KEYS.P; 
             //is this key sequence (Ctrl + X) already defined
             iFound = cmulti.findMultiKey(uKey);
@@ -122,12 +122,18 @@ namespace FunctionKeys2ControlKeys
             {
                 iFound = cmulti.addMultiKey(uKey);
             }
-            //map 4 key in orange or aqua/green plane to new multikey
-            setKeyToMultiKey((int)CUsbKeyTypes.HWkeys.four, (byte)iFound, cPlanes.plane.orange);
+            //map 4 key in orange or aqua/green plane to new multikey, 
+            setKeyToMultiKey((int)keysToMap[3], (byte)iFound, cPlanes.plane.orange);
 
             _cusbKeys.writeKeyTables();
         }
 
+        /// <summary>
+        /// map a key to a multikey index
+        /// </summary>
+        /// <param name="iKey">the key to map</param>
+        /// <param name="iMultiIndex">zero based index to Multi1, Multi2...</param>
+        /// <param name="cPlane">keyboard plane</param>
         private void setKeyToMultiKey(int iKey, byte iMultiIndex, cPlanes.plane cPlane)
         {
             CUSBkeys.usbKeyStruct remapKey = new CUSBkeys.usbKeyStruct();
@@ -137,7 +143,8 @@ namespace FunctionKeys2ControlKeys
                 remapKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
                 remapKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
                 remapKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.MultiKeyIndex;
-                remapKey.bIntScan = (byte)iMultiIndex;
+                remapKey.bIntScan = (byte)(iMultiIndex+1); //the idx is zero based! but it is Multi1, Multi2...
+
 
                 _cusbKeys.setKey((int)cPlane, iKey, remapKey);
             }
@@ -152,6 +159,7 @@ namespace FunctionKeys2ControlKeys
                 remapKey.bIntScan = (byte)iMultiIndex;
                 _cusbKeys.addKey(cPlane, remapKey);
             }
+            System.Diagnostics.Debug.WriteLine("setKeyToMultiKey: " + _cusbKeys.dumpKey(remapKey));
         }
 
         /// <summary>

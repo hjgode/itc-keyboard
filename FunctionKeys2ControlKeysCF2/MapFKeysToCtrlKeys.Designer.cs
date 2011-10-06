@@ -33,9 +33,11 @@ namespace FunctionKeys2ControlKeys
             this.menuItem1 = new System.Windows.Forms.MenuItem();
             this.mnuOptions = new System.Windows.Forms.MenuItem();
             this.mnuDump = new System.Windows.Forms.MenuItem();
+            this.mnuRestore = new System.Windows.Forms.MenuItem();
             this.btnMapKeys = new System.Windows.Forms.Button();
             this.btnRestoreDefaults = new System.Windows.Forms.Button();
-            this.mnuRestore = new System.Windows.Forms.MenuItem();
+            this.txtLog = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // mainMenu1
@@ -59,9 +61,14 @@ namespace FunctionKeys2ControlKeys
             this.mnuDump.Text = "Dump Keys";
             this.mnuDump.Click += new System.EventHandler(this.mnuDump_Click);
             // 
+            // mnuRestore
+            // 
+            this.mnuRestore.Text = "Restore Defaults";
+            this.mnuRestore.Click += new System.EventHandler(this.mnuRestore_Click);
+            // 
             // btnMapKeys
             // 
-            this.btnMapKeys.Location = new System.Drawing.Point(31, 84);
+            this.btnMapKeys.Location = new System.Drawing.Point(42, 17);
             this.btnMapKeys.Name = "btnMapKeys";
             this.btnMapKeys.Size = new System.Drawing.Size(165, 27);
             this.btnMapKeys.TabIndex = 0;
@@ -70,17 +77,35 @@ namespace FunctionKeys2ControlKeys
             // 
             // btnRestoreDefaults
             // 
-            this.btnRestoreDefaults.Location = new System.Drawing.Point(31, 133);
+            this.btnRestoreDefaults.Location = new System.Drawing.Point(42, 64);
             this.btnRestoreDefaults.Name = "btnRestoreDefaults";
             this.btnRestoreDefaults.Size = new System.Drawing.Size(165, 27);
             this.btnRestoreDefaults.TabIndex = 0;
             this.btnRestoreDefaults.Text = "Restore Defaults";
             this.btnRestoreDefaults.Click += new System.EventHandler(this.btnRestoreDefaults_Click);
             // 
-            // mnuRestore
+            // txtLog
             // 
-            this.mnuRestore.Text = "Restore Defaults";
-            this.mnuRestore.Click += new System.EventHandler(this.mnuRestore_Click);
+            this.txtLog.AcceptsReturn = true;
+            this.txtLog.AcceptsTab = true;
+            this.txtLog.Location = new System.Drawing.Point(3, 140);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.txtLog.Size = new System.Drawing.Size(236, 125);
+            this.txtLog.TabIndex = 1;
+            this.txtLog.Text = "textBox1";
+            this.txtLog.WordWrap = false;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(100, 107);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(107, 27);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "TEST";
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // MapFKeysToCtrlKeys
             // 
@@ -89,6 +114,8 @@ namespace FunctionKeys2ControlKeys
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(240, 268);
             this.ControlBox = false;
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.txtLog);
             this.Controls.Add(this.btnRestoreDefaults);
             this.Controls.Add(this.btnMapKeys);
             this.Menu = this.mainMenu1;
@@ -106,6 +133,8 @@ namespace FunctionKeys2ControlKeys
         private System.Windows.Forms.MenuItem mnuOptions;
         private System.Windows.Forms.MenuItem mnuDump;
         private System.Windows.Forms.MenuItem mnuRestore;
+        private System.Windows.Forms.TextBox txtLog;
+        private System.Windows.Forms.Button button1;
     }
 }
 

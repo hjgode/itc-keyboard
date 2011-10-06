@@ -387,7 +387,6 @@ namespace ITC_KEYBOARD
                 new CvkMap ( 0xFE,"VK_OEM_CLEAR" ),
                 new CvkMap ( 0xFF,"VK_undef" ),
         };
-
         //names of shifted VK values, ie Shift-2 is '@'
         //as on US keyboard
         public static CvkMap[] vkValuesShifted = {

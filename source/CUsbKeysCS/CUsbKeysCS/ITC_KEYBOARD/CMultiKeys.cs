@@ -72,9 +72,9 @@ namespace ITC_KEYBOARD
         /// <returns>a string with the meanings of the structure</returns>
         public string dumpMultiKey(CUSBkeys.usbKeyStructShort _theBytes)
         {
-            string s = _theBytes.bFlagLow.ToString("X02");
-            s += "," + _theBytes.bFlagMid.ToString("X02");
-            s += "," + _theBytes.bFlagHigh.ToString("X02");
+            string s = ((byte)(_theBytes.bFlagLow)).ToString("X02");
+            s += "," + ((byte)(_theBytes.bFlagMid)).ToString("X02");
+            s += "," + ((byte)(_theBytes.bFlagHigh)).ToString("X02");
             s += "," + _theBytes.bIntScan.ToString("X02");
 
             //getName does not care about extended etc...
@@ -265,11 +265,17 @@ namespace ITC_KEYBOARD
             int compareCount = 0;
             //find existing entries for multikey
             CUSBkeys.usbKeyStructShort[] mStruct;
+
+            //for(int i=0; i<multiKeys.Length;i++)
+            //    this.dumpMultiKey(multiKeys[i]);
+
+            //look thru all multikeys
             for (int i = 0; i < iMax; i++)
             {
                 compareCount = 0;
                 //read thru all multikey entries, Multi1, Multi2 ...
                 mStruct = this.getMultiKey(i, ref iResult);
+                //compare bytes
                 if (mStruct.Length == multiKeys.Length) //need to be the same sizes
                 {
                     //compare multikey structs
@@ -277,14 +283,17 @@ namespace ITC_KEYBOARD
                     {
                         if (mStruct[j].Equals(multiKeys[j]))
                             compareCount++;
+                        else
+                            break;
+                    }
+                    if (compareCount == multiKeys.Length)
+                    {
+                        iFound = i;
+                        break;
                     }
                 }
-                if (compareCount == multiKeys.Length)
-                {
-                    iFound = i;
-                    break;
-                }
             }
+
             return iFound;
         }
 
