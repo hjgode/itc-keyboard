@@ -45,6 +45,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
         private static extern int ITC_ResetKeyDefaultsCN50();
         [DllImport("KbdRemapCS40.cpl", EntryPoint = "ITC_ResetKeyDefaults", CharSet = CharSet.Unicode)]
         private static extern int ITC_ResetKeyDefaultsCS40();
+        //new with CN50, Cx7x
         [DllImport("KBDTools.CPL", EntryPoint = "ResetAll", CharSet = CharSet.Unicode)]
         private static extern int ITC_ResetAllCN70();
 
@@ -837,6 +838,14 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             }
             return iIndex;
         }
+        
+        public int getKeyCount(cPlanes.plane cPlane)
+        {
+            if ((int)cPlane > this.getNumPlanes())
+                return -1;
+            return _usbKeysAll[((int)cPlane)].Length;
+        }
+
         /// <summary>
         /// get the actual keyStruct for the key with iScanCode in the actual keytable
         /// </summary>
@@ -1364,7 +1373,7 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             //pinn the mememory block
             GCHandle hDataIn = GCHandle.Alloc(dataIn, GCHandleType.Pinned);
             //create a new byte[] with new size
-            usbKeyStruct[] _usbKeys = new usbKeyStruct[dataIn.Length / 5];
+            usbKeyStruct[] _usbKeys = new usbKeyStruct[dataIn.Length / 6];
             //copy the bytes into the struct
             _usbKeys = (usbKeyStruct[])Marshal.PtrToStructure(hDataIn.AddrOfPinnedObject(), typeof(usbKeyStruct));
             hDataIn.Free();
