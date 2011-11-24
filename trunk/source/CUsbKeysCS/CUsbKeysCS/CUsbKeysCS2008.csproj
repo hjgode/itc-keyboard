@@ -89,6 +89,7 @@
     <Compile Include="ITC_KEYBOARD\HWkeys\CUsbHwKeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\HardwareKeys.cs" />
     <Compile Include="ITC_KEYBOARD\ITC_Tools.cs" />
+    <Compile Include="ITC_KEYBOARD\KdbToolsClass.cs" />
     <Compile Include="ITC_KEYBOARD\USB-HID-PS2.cs" />
     <Compile Include="ITC_KEYBOARD\UsbKeyFlags.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
