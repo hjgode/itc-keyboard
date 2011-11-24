@@ -65,6 +65,12 @@ namespace ITC_KEYBOARD
                 return usbShort;
             }
        }
+        /*
+        setKeyToMultiKey: 07,1E,00,42,04,31 '1' [NoFlag,NoRepeat, NoChord,MultiKeyIndex,] 'n' 'MultiIndex'->08,40,00,01 'F9' | 00,40,00,15 'q' | 
+        setKeyToMultiKey: 07,1F,00,42,04,32 '2' [NoFlag,NoRepeat, NoChord,MultiKeyIndex,] 'b' 'MultiIndex'->08,40,00,01 'F9' | 00,40,00,22 'x' | 
+        setKeyToMultiKey: 07,20,00,42,04,33 '3' [NoFlag,NoRepeat, NoChord,MultiKeyIndex,] 'h' 'MultiIndex'->08,40,00,01 'F9' | 00,40,00,24 'e' | 
+        setKeyToMultiKey: 07,21,00,42,04,34 '4' [NoFlag,NoRepeat, NoChord,MultiKeyIndex,] 'g' 'MultiIndex'->08,40,00,01 'F9' | 00,40,00,4D 'p' | 
+        */
        /// <summary>
         /// gives a text dump reprensentation of the multikey
         /// </summary>
@@ -72,13 +78,17 @@ namespace ITC_KEYBOARD
         /// <returns>a string with the meanings of the structure</returns>
         public string dumpMultiKey(CUSBkeys.usbKeyStructShort _theBytes)
         {
-            string s = ((byte)(_theBytes.bFlagLow)).ToString("X02");
+            string s = "";
+            s += ((byte)(_theBytes.bFlagHigh)).ToString("X02");
             s += "," + ((byte)(_theBytes.bFlagMid)).ToString("X02");
-            s += "," + ((byte)(_theBytes.bFlagHigh)).ToString("X02");
+            s += "," + ((byte)(_theBytes.bFlagLow)).ToString("X02");
             s += "," + _theBytes.bIntScan.ToString("X02");
 
             //getName does not care about extended etc...
-            s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(_theBytes.bIntScan) + "'";
+            if ((_theBytes.bFlagMid & CUsbKeyTypes.usbFlagsMid.VKEY) == CUsbKeyTypes.usbFlagsMid.VKEY)
+                s += " '" + ITC_KEYBOARD.CvkMap.getName(_theBytes.bIntScan) + "'";
+            else
+                s += " '" + ITC_KEYBOARD.CUSBPS2_vals.Cusbps2key.getName(_theBytes.bIntScan) + "'";
             s += " | ";
             return s;
         }
@@ -89,8 +99,11 @@ namespace ITC_KEYBOARD
         /// <returns>a string with the meanings of the structure</returns>
         public string dumpMultiKey(int iIdx)
         {
-            byte[] bs = _MultiKeyStructList[iIdx - 1];
-            CUSBkeys.usbKeyStructShort[] rs = RawDeserialize2(bs);
+            if (iIdx > this._multiKeyCount)
+                return "na";
+            //byte[] bs = _MultiKeyStructList[iIdx - 1];
+            //CUSBkeys.usbKeyStructShort[] rs = RawDeserialize2(bs);
+            CUSBkeys.usbKeyStructShort[] rs = _MultiKeys[iIdx-1];
             string s = "->";
             for (int i = 0; i < rs.Length; i++)
             {
@@ -224,17 +237,17 @@ namespace ITC_KEYBOARD
 
         private void readAll()
         {
-            int iCount = this.getMultiKeyCount();
-            if (iCount == 0)
+            _multiKeyCount = this.getMultiKeyCount();
+            if (_multiKeyCount == 0)
                 return;
             //read all MultiKeys entries
-            _MultiKeyStructs = new CUSBkeys.usbKeyStructShort[iCount];
+            _MultiKeyStructs = new CUSBkeys.usbKeyStructShort[_multiKeyCount];
 
             string regKeyb = CUSBkeys.getRegLocation() + @"\MultiKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
 
-            _MultiKeys = new CUSBkeys.usbKeyStructShort[iCount][];
-            for (int i = 0; i < iCount; i++)
+            _MultiKeys = new CUSBkeys.usbKeyStructShort[_multiKeyCount][];
+            for (int i = 0; i < _multiKeyCount; i++)
             {
                 byte[] bMultiKeys = (byte[])tempKey.GetValue("Multi" + (i+1).ToString());
                 int bCount = bMultiKeys.Length / 4;

@@ -327,7 +327,7 @@ namespace ITC_KEYBOARD
 		/// the name of the delta event
 		/// </param>
 		/// <returns>
-		/// 0 on success
+		/// idx of new entry on success
 		/// -1 on failure
 		/// </returns>
         public int addNamedEvent(string sState, string sDelta)
@@ -348,12 +348,42 @@ namespace ITC_KEYBOARD
                 regTemp.Close();
 				//read tables
 				this.readReg();
-                return 0;
+                return iNewEventCount-1;
             }
             catch (Exception)
             {
                 return -1;                
             }
+        }
+
+        /// <summary>
+        /// get the index of a NamedEvent
+        /// </summary>
+        /// <returns>
+        /// the number (EventXX) of the NamedEvents or -1 if missing
+        /// NOTE: idx starts at 0 but registry uses 1 as start
+        /// </returns>
+        public int findEventIndex(string sNamedEvent)
+        {
+            int iRet = -1;
+            string sRegEventsState = getRegLocation() + @"\Events\State";
+            string sRegEventsDelta = getRegLocation() + @"\Events\Delta";
+
+            //the events are below this in branches called Events\State and Events\Delta
+            int iEventCount = this.getEventCount();
+            int idx = 0;
+            do 
+            {
+                if (this._eventPairsDelta[idx].eventValue == sNamedEvent)
+                {
+                    iRet = Convert.ToInt16(this._eventPairsDelta[idx].eventName.Substring("Event".Length));
+                }
+                if (this._eventPairsState[idx].eventValue == sNamedEvent)
+                    iRet = Convert.ToInt16(this._eventPairsDelta[idx].eventName.Substring("Event".Length)); 
+
+                idx++;
+            }while (idx<iEventCount && iRet==-1);
+            return iRet;
         }
 		/// <summary>
 		/// get the number og known named events
