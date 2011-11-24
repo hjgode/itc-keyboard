@@ -59,13 +59,13 @@ namespace FunctionKeys2ControlKeys
 
             //map to modifier key 
             uKey[0].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            uKey[0].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
+            uKey[0].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag | CUsbKeyTypes.usbFlagsMid.NoChord;
             uKey[0].bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
             uKey[0].bIntScan = (byte)iCtrlIdx;  //points to control modifier key index
 
             //map to 'Q'
             uKey[1].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
+            uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag | CUsbKeyTypes.usbFlagsMid.NoChord;
             uKey[1].bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
             uKey[1].bIntScan = (byte)ITC_KEYBOARD.PS2KEYS.Q;
 
@@ -141,7 +141,7 @@ namespace FunctionKeys2ControlKeys
             if (_cusbKeys.getKeyStruct((int)cPlane, iKey, ref remapKey) != -1)
             {   //key exists
                 remapKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-                remapKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                remapKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat | CUsbKeyTypes.usbFlagsMid.NoChord;
                 remapKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.MultiKeyIndex;
                 remapKey.bIntScan = (byte)(iMultiIndex+1); //the idx is zero based! but it is Multi1, Multi2...
 
@@ -154,7 +154,7 @@ namespace FunctionKeys2ControlKeys
                 remapKey.bHID = 0x07;
                 remapKey.bScanKey = (CUsbKeyTypes.HWkeys)iKey;
                 remapKey.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-                remapKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                remapKey.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat | CUsbKeyTypes.usbFlagsMid.NoChord;
                 remapKey.bFlagLow = CUsbKeyTypes.usbFlagsLow.MultiKeyIndex;
                 remapKey.bIntScan = (byte)iMultiIndex;
                 _cusbKeys.addKey(cPlane, remapKey);
