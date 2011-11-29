@@ -4,6 +4,19 @@
 
 Tasker2 - a tool to schedule start and kill applications
 
+v2.28
+	added nclog msg in RegReadAll, depends on new registry key DbgLevel. RegReadAll uses dbgLevel>4
+	added regReadDbgLevel to control which msgs are logged
+	changed code to use only one CurrentTime
+	moved check for mutex to very beginning of main()
+		so, if an instance is already running, 
+		the launch time and the time tasker2 will continue to run may be different!
+	changed mutex code and use initial ownership
+		found in log that lines were mixed between concurrent processes, now the lines
+		show that one process really waits until the other ended:
+	added OpenKey(szCurrentKey) before every attempt to read from registry
+		there was an issue that the global subkey changed for no reason
+	
 v2.27
 	moved checkForVaildDate after mutex check
 	added scheduleAllEvents before exit on non-valid date

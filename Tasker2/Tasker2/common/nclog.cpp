@@ -193,6 +193,7 @@ static int writefile(TCHAR *filetext){
 
 	/* paremeter witch stores the text or data to right to the file. */
 	fwrite(szTempA, 1, fsize, fp);		/* Write File */
+	fflush(fp);
 	fclose(fp); /* Remember to close the file stream after calling file functions, */
 
 	/* otherwise the file wont be created. */

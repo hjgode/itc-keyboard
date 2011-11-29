@@ -17,7 +17,9 @@ SYSTEMTIME DT_Add(SYSTEMTIME& Date, short Years, short Months, short Days, short
 	FILETIME ft; SYSTEMTIME st; ULARGE_INTEGER ul1;
 	
 	SYSTEMTIME inTime;
-	GetLocalTime(&inTime); //actual time and date
+	//v2.28 GetLocalTime(&inTime); //actual time and date
+	extern SYSTEMTIME g_CurrentStartTime;
+	memcpy(&inTime, &g_CurrentStartTime, sizeof(SYSTEMTIME));
 	inTime.wDay = Date.wDay;
 	inTime.wHour = Date.wHour;
 	inTime.wMinute = Date.wMinute;
@@ -67,7 +69,9 @@ SYSTEMTIME DT_Add(SYSTEMTIME& Date, short Years, short Months, short Days, short
 
 SYSTEMTIME DT_AddDay(const SYSTEMTIME st){
 	SYSTEMTIME stNow;
-	GetLocalTime(&stNow);
+	extern SYSTEMTIME g_CurrentStartTime;//v2.28 
+	memcpy(&stNow, &g_CurrentStartTime, sizeof(SYSTEMTIME));
+	//GetLocalTime(&stNow);
 	
 	stNow.wHour=st.wHour;
 	stNow.wMinute=st.wMinute;
@@ -222,7 +226,7 @@ HRESULT ScheduleRunApp(
 
 	// calculate time
 	SYSTEMTIME st = {0};
-	GetLocalTime(&st);
+	//GetLocalTime(&st); //v.2.28
 
 	/*
 	st = DT_AddDiff(nano100SecInDay, 1, &st);
@@ -266,7 +270,9 @@ HRESULT ScheduleRunApp(
 	//do not add a schedule if actual date is 21.3.2003
 	SYSTEMTIME t;
 	memset(&t, 0, sizeof(SYSTEMTIME));
-	GetLocalTime(&t);
+	extern SYSTEMTIME g_CurrentStartTime;
+	memcpy(&t, &g_CurrentStartTime, sizeof(SYSTEMTIME));
+	//GetLocalTime(&t); //v.2.28
 	//check if the system clock is at factory default, device specific!
 	if ( (t.wYear == 2003) && (t.wMonth == 3) && (t.wDay == 21) )
 	{
@@ -286,7 +292,9 @@ HRESULT ScheduleRunApp(
 
 	// calculate time
 	SYSTEMTIME st = {0};
-	GetLocalTime(&st);
+	extern SYSTEMTIME g_CurrentStartTime;
+	memcpy(&st, &g_CurrentStartTime, sizeof(SYSTEMTIME));
+	//GetLocalTime(&st);
 
 	/*
 	st = DT_AddDiff(nano100SecInDay, 1, &st);
@@ -501,7 +509,9 @@ int RunAppAtTime(TCHAR FileName[MAX_PATH+1])
 	//get actual time
 	SYSTEMTIME t;
 	memset(&t, 0, sizeof(SYSTEMTIME));
-	GetLocalTime(&t);
+	extern SYSTEMTIME g_CurrentStartTime;
+	memcpy(&t, &g_CurrentStartTime, sizeof(SYSTEMTIME));
+	//GetLocalTime(&t); //v2.28
 
 	SYSTEMTIME newTime;
 	//add one day
