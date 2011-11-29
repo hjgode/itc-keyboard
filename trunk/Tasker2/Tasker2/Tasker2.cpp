@@ -12,6 +12,7 @@
 #pragma comment(lib, "C:/Program Files (x86)/Intermec/Developer Library/Lib/WCE600/WM6/Armv4i/itc50.lib")
 
 extern TASK _Tasks[iMaxTasks];
+SYSTEMTIME g_CurrentStartTime;
 
 TCHAR* szTaskerEXE = L"\\Windows\\Tasker2.exe";
 
@@ -76,8 +77,9 @@ int scheduleAllTasks(){
 			short shMin		=	_Tasks[iTask].stDiffTime.wMinute;
 			short shDays	=   0;
 
-			SYSTEMTIME stNewTime, stCurrentTime;
-			GetLocalTime(&stCurrentTime);
+			SYSTEMTIME stNewTime;
+			//SYSTEMTIME stCurrentTime;
+			//GetLocalTime(&stCurrentTime); //v2.28
 
 			stNewTime=_Tasks[iTask].stStartTime;
 			if(shHour>=24){	//hour interval value is one day or more
@@ -189,17 +191,48 @@ int _tmain(int argc, _TCHAR* argv[])
 	DEBUGMSG(1, (L"here we are: '%s'\n", argv[0]));
 
 	nclog(L"++++++++++++++++ Tasker v%i started +++++++++++++++++++\n", _dwVersion);
+
+	//##################### dont run if already running #############################
+	nclog(L"Checking for Mutex (single instance allowed only)...\n");
+
+	hMutex=CreateMutex(NULL, TRUE, MY_MUTEX);
+	if(hMutex==NULL){
+		//this should never happen
+		nclog(L"Error in CreateMutex! GetLastError()=%i\n", GetLastError());
+		nclog(L"-------- END -------\n");
+		return -99;
+	}
+	DWORD dwLast = GetLastError();
+	if(dwLast== ERROR_ALREADY_EXISTS){//mutex already exists, wait for mutex release
+		nclog(L"\tAttached to existing mutex\n");
+		nclog(L"................ Waiting for mutex release......\n");
+		WaitForSingleObject( hMutex, INFINITE );
+		nclog(L"++++++++++++++++ Mutex released. +++++++++++++++\n");
+	}
+	else{
+		nclog(L"\tCreated new mutex\n");
+	}
+
+	//##################### dont run if already running #############################
+	
 	BOOL bIsDelayedSchedule = TRUE; //used to save a delayed schedule situation
 
 	SYSTEMTIME stNow;
 	GetLocalTime(&stNow);
+	//clean up
+	stNow.wSecond=0;
+	stNow.wMilliseconds=0;
+
 	nclog(L"%02i.%02i.%04i, %02i:%02i\n",
 		stNow.wDay, stNow.wMonth, stNow.wYear,
 		stNow.wHour, stNow.wMinute);
+
 	nclog(L"CmdLine = \n");
 	for(int x=1; x<argc; x++){
 		nclog(L"\targv[%i]: '%s\n", x, argv[x]);
 	}
+	//v2.28: use only one current time, the time the exe has been started
+	memcpy(&g_CurrentStartTime, &stNow, sizeof(SYSTEMTIME));
 
 		//change tasker2.exe path
 	// Get name of executable
@@ -210,26 +243,6 @@ int _tmain(int argc, _TCHAR* argv[])
 	wsprintf(szTaskerEXE, lpFileName);
 
 	//check if date/time is valid moved down in v 2.27
-
-	nclog(L"Checking for Mutex (single instance allowed only)...\n");
-
-	hMutex=CreateMutex(NULL, FALSE, MY_MUTEX);
-	DWORD dwLast = GetLastError();
-	if(hMutex!=NULL && dwLast== ERROR_ALREADY_EXISTS){//mutex did not exist, create a new mutex
-		nclog(L"\tAttached to existing mutex\n");
-	}
-	else{
-		iCountInstances=0;
-		nclog(L"\tCreated new mutex\n");
-	}
-
-	if(dwLast== ERROR_ALREADY_EXISTS){
-		nclog(L"\tWaiting for mutex released...\n");
-		iCountInstances++;
-		WaitForSingleObject( hMutex, INFINITE );
-		iCountInstances--;
-		nclog(L"\t... Mutex released.\n");
-	}
 
 	//read all task entries from REG and version number
 	int iRegRet = regReadKeys();
@@ -260,9 +273,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	//}
 	writeVersion(_dwVersion);
 
-	SYSTEMTIME stCurrentTime;
-	GetLocalTime(&stCurrentTime); //store the current local time
-
+	//v2.28: we now use a global current time called g_CurrentStartTime
+	//it is initialized with program start
+	//SYSTEMTIME stCurrentTime;
+	//GetLocalTime(&stCurrentTime); //store the current local time
 
 	if(argc==1){ //equal to no arguments
 		//just re-schedule all tasks
@@ -400,6 +414,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 	nclog(L"\tReleaseMutex...");
+	ReleaseMutex(MY_MUTEX);
 	if(CloseHandle(hMutex))
 		nclog(L"OK\n");
 	else{
@@ -416,8 +431,8 @@ int _tmain(int argc, _TCHAR* argv[])
 int processStartStopCmd(TCHAR* argv[]){
 	int iReturn = 0;
 
-	SYSTEMTIME stCurrentTime;
-	GetLocalTime(&stCurrentTime); //store the current local time
+	//SYSTEMTIME stCurrentTime;
+	//GetLocalTime(&stCurrentTime); //store the current local time
 	BOOL bIsDelayedSchedule = TRUE; //used to save a delayed schedule situation
 
 	enum taskType{
@@ -459,15 +474,15 @@ int processStartStopCmd(TCHAR* argv[]){
 		int iDeltaMinutes;
 
 		if(thisTaskType==stopTask){
-			iDeltaMinutes = stDeltaMinutes(_Tasks[iTask].stStopTime, stCurrentTime);
+			iDeltaMinutes = stDeltaMinutes(_Tasks[iTask].stStopTime, g_CurrentStartTime);
 			nclog(L"stStopTime = '%s', ", getLongStrFromSysTime2(_Tasks[iTask].stStopTime));
 		}
 		else{
-			iDeltaMinutes = stDeltaMinutes(_Tasks[iTask].stStartTime, stCurrentTime);
+			iDeltaMinutes = stDeltaMinutes(_Tasks[iTask].stStartTime, g_CurrentStartTime);
 			nclog(L"stStartTime = '%s', ", getLongStrFromSysTime2(_Tasks[iTask].stStartTime));
 		}
 
-		nclog(L"current time = '%s'\n", getLongStrFromSysTime2(stCurrentTime));
+		nclog(L"current time = '%s'\n", getLongStrFromSysTime2(g_CurrentStartTime));
 		nclog(L"interval is: %id%02ih%02im\n", shDays, shHour, shMin);
 
 		if(thisTaskType==stopTask)
@@ -595,12 +610,12 @@ void dumpST(SYSTEMTIME st){
 	return time of next schedule in future that meets the given interval
 */
 SYSTEMTIME createNextSchedule(SYSTEMTIME stNext, short shDays, short shHour, short shMin){
-	SYSTEMTIME stCurrentTime;
-	GetLocalTime(&stCurrentTime);
+	//SYSTEMTIME stCurrentTime;
+	//GetLocalTime(&stCurrentTime);
 	
-	//cleanup
-	stCurrentTime.wSecond=0;
-	stCurrentTime.wMilliseconds=0;
+	//cleanup, done now at startup
+	//stCurrentTime.wSecond=0;
+	//stCurrentTime.wMilliseconds=0;
 
 	TCHAR szTime[24] = {0};
 
@@ -617,13 +632,13 @@ SYSTEMTIME createNextSchedule(SYSTEMTIME stNext, short shDays, short shHour, sho
 	nclog(L"\tinterval is: %id%02ih%02im\n", shDays, shHour, shMin);
 #if DEBUG
 	dumpST(L"stNext", stNext);
-	dumpST(L"stCurrentTime", stCurrentTime);
+	dumpST(L"stCurrentTime", g_CurrentStartTime);
 #endif
-	if(!isNewer(stNext, stCurrentTime)){
+	if(!isNewer(stNext, g_CurrentStartTime)){
 		do{
 			//add interval to stNewTime
 			stNext = DT_Add(stNext, 0, 0, shDays, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
-		}while (!isNewer(stNext, stCurrentTime));
+		}while (!isNewer(stNext, g_CurrentStartTime));
 		nclog(L"\tschedule adjusted to '%s'\n", getLongStrFromSysTime2(stNext));
 	}
 	//else
@@ -679,12 +694,12 @@ SYSTEMTIME getNextTime(SYSTEMTIME stStart, SYSTEMTIME stBegin, int iIntervalDays
 */
 SYSTEMTIME createDelayedNextSchedule(SYSTEMTIME stNext, short shDays, short shHour, short shMin){
 	nclog(L"+++ createDelayedNextSchedule: delayed schedule recalculation...\n");
-	SYSTEMTIME stCurrentTime;
-	GetLocalTime(&stCurrentTime);
+	//SYSTEMTIME stCurrentTime;
+	//GetLocalTime(&stCurrentTime);
 	
-	//cleanup
-	stCurrentTime.wSecond=0;
-	stCurrentTime.wMilliseconds=0;
+	//cleanup, v2.28 now done in main
+	//stCurrentTime.wSecond=0;
+	//stCurrentTime.wMilliseconds=0;
 
 	TCHAR szTime[24] = {0};
 
@@ -701,12 +716,12 @@ SYSTEMTIME createDelayedNextSchedule(SYSTEMTIME stNext, short shDays, short shHo
 	nclog(L"\tinterval is: %id%02ih%02im\n", shDays, shHour, shMin);
 #if DEBUG
 	dumpST(L"stNext", stNext);
-	dumpST(L"stCurrentTime", stCurrentTime);
+	dumpST(L"stCurrentTime", g_CurrentStartTime);
 #endif
 	//for delayed schedules 
 	//example: stStopTime = '200902011205' and current time = '200902010000' and interval is: 0d00h10m
 	//we need to get to stNext = '200902010005'
-	SYSTEMTIME stNextNew = getNextTime(stNext, stCurrentTime, shDays, shHour, shMin);
+	SYSTEMTIME stNextNew = getNextTime(stNext, g_CurrentStartTime, shDays, shHour, shMin);
 	stNext=stNextNew;
 	nclog(L"\tschedule adjusted to '%s'\n", getLongStrFromSysTime2(stNext));
 	//if(!isNewer(stNext, stCurrentTime)){

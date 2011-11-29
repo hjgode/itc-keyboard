@@ -6,8 +6,6 @@ extern void nclog (const wchar_t *fmt, ...);
 //extern bool set_nclog_port(unsigned short x) { return wsa_bind(x); }
 extern TCHAR* logDateTime();
 
-static int iCountInstances = 0;	//number of current running instance, used for additional output of instance number
-
 /*
 usage:
 	nclog(L"The Window Handle is: %x\n",hwnd); 

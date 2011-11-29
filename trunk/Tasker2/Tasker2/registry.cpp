@@ -10,7 +10,7 @@
 */
 //global
 HKEY g_hkey=NULL;
-TCHAR g_subkey[MAX_PATH+1]=L"Software\\Intermec\\KeyToggleStart";
+TCHAR g_subkey[MAX_PATH+1]=L"Software\\Tasker";
 
 int ReadBuildNumber(TCHAR *szBuildNumber)
 {
@@ -245,7 +245,7 @@ int RegReadStr(TCHAR *valuename, TCHAR *value)
 				return 0;
 			}
 			else
-				DEBUGMSG(1, (L"RegReadStr '%s' failed error=%i\n", valuename, GetLastError()));
+				DEBUGMSG(1, (L"RegReadStr '%s' failed error=%i\n", valuename, rc));
 		}
 	}
 	else
@@ -455,7 +455,9 @@ void SetToday(void)
 	//tinfo=localtime( &time_of_day );	
 	SYSTEMTIME *tinfo = new SYSTEMTIME;
 	memset(tinfo,0,sizeof(tinfo));
-	GetLocalTime(tinfo);
+	extern SYSTEMTIME g_CurrentStartTime;
+	memcpy(tinfo, &g_CurrentStartTime, sizeof(SYSTEMTIME));
+	//GetLocalTime(tinfo); //v2.28
 	
 	m_day=tinfo->wDay;//  tinfo->tm_mday;
 	m_month=tinfo->wMonth+1;// tm_mon+1;

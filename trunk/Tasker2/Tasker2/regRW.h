@@ -26,6 +26,7 @@
 	} taskStruct;
 
 	extern DWORD _dwVersion;
+	DWORD regReadDbgLevel();
 
 	int regReadKeys();
 	int getTaskNumber(TCHAR* _sTask);
