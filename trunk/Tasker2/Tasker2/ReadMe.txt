@@ -6,7 +6,7 @@ Tasker2 - a tool to schedule start and kill applications
 
 v2.28
 	added nclog msg in RegReadAll, depends on new registry key DbgLevel. RegReadAll uses dbgLevel>4
-	added regReadDbgLevel to control which msgs are logged
+	added regReadDbgLevel to control which msgs are logged, currently dbgLevel=5 will make RegRead msgs visible
 	changed code to use only one CurrentTime
 	moved check for mutex to very beginning of main()
 		so, if an instance is already running, 
