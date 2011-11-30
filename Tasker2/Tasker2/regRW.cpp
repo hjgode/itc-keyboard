@@ -1,7 +1,6 @@
 //regRW.cpp
 
 #include "stdafx.h"
-#include "registry.h"
 #include "task.h"
 #include "regRW.h"
 #include "./common/nclog.h"
@@ -11,9 +10,10 @@
 TASK _Tasks[iMaxTasks];
 int iTaskCount=0;
 
-DWORD _dwVersion = 228L;
+DWORD _dwVersion = 229L;
+int _dbgLevel = 0;
 
-TCHAR* _szRegKey = L"Software\\tasker";
+static TCHAR* _szRegKey = L"Software\\tasker";
 TCHAR _szRegSubKeys[10][MAX_PATH];
 
 int getTaskNumber(TCHAR* _sTask){
@@ -28,12 +28,12 @@ int getTaskNumber(TCHAR* _sTask){
 
 ///convert a HourMinute string (ie "1423) to a systemtime
 int getSTfromString(SYSTEMTIME* sysTime /*in,out*/, TCHAR* sStr /*in*/){
-	DWORD dbgLevel=regReadDbgLevel();
 
-	if(dbgLevel>4) nclog(L"getSTfromString: ...\n");
+	if(_dbgLevel>4) 
+		nclog(L"getSTfromString: ...\n");
 	int iRet=-1;
 	if(wcslen(sStr)!=4){
-		if(dbgLevel>4) nclog(L"getSTfromString: failure, string len not equal to 4\n");
+		if(_dbgLevel>4) nclog(L"getSTfromString: failure, string len not equal to 4\n");
 		return -1;	//string to short
 	}
 	extern SYSTEMTIME g_CurrentStartTime;
@@ -46,27 +46,27 @@ int getSTfromString(SYSTEMTIME* sysTime /*in,out*/, TCHAR* sStr /*in*/){
 	int iMinute = iTime % 100;
 	sysTime->wHour=iHour;
 	sysTime->wMinute=iMinute;
-	if(dbgLevel>4) nclog(L"getSTfromString: return with '%s'\n", sStr);
+	if(_dbgLevel>4) nclog(L"getSTfromString: return with '%s'\n", sStr);
 	return 0;
 }
 
 ///convert a systemtime to a HourMinute string (ie "1423")
 int getStrFromSysTime(SYSTEMTIME sysTime, TCHAR sStr[4+1]){
-	DWORD dbgLevel=regReadDbgLevel();
-	if(dbgLevel>4) nclog(L"getSTfromString2: ...\n");
+	if(_dbgLevel>4) 
+		nclog(L"getSTfromString2: ...\n");
 	int iRet=-1;
 	if(wcslen(sStr)!=4){
-		if(dbgLevel>4) nclog(L"getSTfromString2: failure, string len not equal to 4\n");
+		if(_dbgLevel>4) nclog(L"getSTfromString2: failure, string len not equal to 4\n");
 		return -1;	//string to short
 	}
 	TCHAR sTemp[4+1];
 	wsprintf(sTemp, L"%02i%02i", sysTime.wHour, sysTime.wMinute);
 	if(wcsncpy(sStr, sTemp, 4)==NULL){
-		if(dbgLevel>4) nclog(L"getSTfromString2: returning with error for '%s'\n", sTemp);
+		if(_dbgLevel>4) nclog(L"getSTfromString2: returning with error for '%s'\n", sTemp);
 		return -1;
 	}
 	else{
-		if(dbgLevel>4) nclog(L"getSTfromString2: returning with '%s'\n", sStr);
+		if(_dbgLevel>4) nclog(L"getSTfromString2: returning with '%s'\n", sStr);
 		return 0; //no Error
 	}
 }
@@ -125,9 +125,8 @@ int getLongStrFromSysTime(SYSTEMTIME sysTime, TCHAR* sStr){
 	int iRet=-1;
 	wsprintf(sStr, L"000000000000");
 	int iSize = wcslen(sStr);
-	DWORD dwDbgLevel=regReadDbgLevel();
 	if(iSize != 12){
-		if(dwDbgLevel>4) nclog(L"getLongStrFromSysTime: str len not equal 12\n");
+		if(_dbgLevel>4) nclog(L"getLongStrFromSysTime: str len not equal 12\n");
 		return -1;	//string to short
 	}
 	TCHAR sTemp[12+1];
@@ -138,7 +137,7 @@ int getLongStrFromSysTime(SYSTEMTIME sysTime, TCHAR* sStr){
 		sysTime.wHour, 
 		sysTime.wMinute);
 	wsprintf(sStr, L"%s", sTemp);
-	if(dwDbgLevel>4) nclog(L"getLongStrFromSysTime: returning with '%s'\n", sStr);
+	if(_dbgLevel>4) nclog(L"getLongStrFromSysTime: returning with '%s'\n", sStr);
 	return 0; //no Error
 
 }
@@ -158,9 +157,9 @@ TCHAR* getLongStrFromSysTime2(SYSTEMTIME sysTime){
 //normalize a SYSTEMTIME, ie, if hours is > 24
 SYSTEMTIME fixSystemTime(SYSTEMTIME st){
 	TCHAR szTemp[13]; wsprintf(szTemp, L"000000000000");
-	DWORD dbgLevel=regReadDbgLevel();
 	getLongStrFromSysTime(st, szTemp);
-	if(dbgLevel>4) nclog(L"fixSystemTime: started with '%s'\n", szTemp);
+	if(_dbgLevel>4) 
+		nclog(L"fixSystemTime: started with '%s'\n", szTemp);
 
 	short shMin=st.wMinute;
 	//minutes above 60? add to hours
@@ -183,439 +182,664 @@ SYSTEMTIME fixSystemTime(SYSTEMTIME st){
 	stReturn.wHour=shHour;
 
 	getLongStrFromSysTime(stReturn, szTemp);
-	if(dbgLevel>4) nclog(L"fixSystemTime: returning with '%s'\n", szTemp);
+	if(_dbgLevel>4) nclog(L"fixSystemTime: returning with '%s'\n", szTemp);
 	return stReturn;
 }
 
 int regWriteDbgLevel(DWORD dwDbgLevel)
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to write
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=dwDbgLevel;
-	if((iRes=RegWriteDword(L"dbglevel", &dwVal))==0)
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
+	DWORD dwVal=0;
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+
+	//prepare subkey to write
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"Could not write %s\n", subkey);
+		iRes=-1;
+		goto exit_regWriteDbgLevel;
+	}
+
+	dwVal=dwDbgLevel;
+	rc = RegSetValueEx(	hKey, L"dbglevel", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
 		DEBUGMSG(1, (L"regWriteDbgLevel: OK. Debug Level is %i\n", dwVal));
 	else
-		DEBUGMSG(1, (L"regWriteDbgLevel: FAILED %i\n", iRes));
+		DEBUGMSG(1, (L"regWriteDbgLevel: FAILED %i\n", rc));
+
+exit_regWriteDbgLevel:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 	return iRes;
 }
 
 DWORD regReadDbgLevel(){
-	DWORD dbgLevel=0;
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=0;
-	if((iRes=RegReadDword(L"dbglevel", &dwVal))==0){
-		DEBUGMSG(1, (L"regReadDbgLevel: OK. dbglevel is %i\n", dwVal));
-		dbgLevel=dwVal;
+	DWORD dwVal=0, dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+
+	TCHAR subkey[MAX_PATH];
+	//prepare subkey to read
+	HKEY hKey=NULL;
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"regReadDbgLevel: FATAL cannot open key '%s': %u. Using default 0\n", subkey, rc);
+		_dbgLevel=0;
+		goto exit_regReadDbgLevel;
+	}
+	//read value
+	rc = RegQueryValueEx(hKey, L"dbglevel", NULL, &dwType, (LPBYTE) &dwVal, &dwSize);
+
+	if(rc == 0){
+		DEBUGMSG(1, (L"regReadDbgLevel: OK. dbglevel is %u\n", dwVal));
+		_dbgLevel=dwVal;
 	}
 	else{
 		dwVal=1;
-		DEBUGMSG(1, (L"regReadDbgLevel: FAILED %i\n", iRes));
-		regWriteDbgLevel(0);
+		DEBUGMSG(1, (L"regReadDbgLevel: FAILED %u\n", rc));
 	}
-	return dbgLevel;
+exit_regReadDbgLevel:
+	RegCloseKey(hKey);
+	regWriteDbgLevel(0);
+	return _dbgLevel;
 }
 
 int regReadKeys(){
-	DWORD dwDbgLevel=regReadDbgLevel();
-
 	int iRet = 0;
-	//count number of subkeys
-	wsprintf(g_subkey, _szRegKey);
+	DWORD dwDbgLevel=regReadDbgLevel();
+	
+	TCHAR subkey[MAX_PATH];
+	memset(&subkey, 0, sizeof(TCHAR)*MAX_PATH);
+	wsprintf(subkey, L"%s", _szRegKey);
 
-	int iCount = regCountSubKeys();
-	if(iCount==-1)
-	{
-		if(dwDbgLevel>4) nclog(L"regReadKeys: No sub keys found\n");
-		return -1;
+	HKEY hKey=NULL;
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"regReadKeys: FATAL cannot open key '%s': %u\n", subkey, rc);
+		iRet=-1;
+		goto exit_readallkeys;
 	}
-	if(dwDbgLevel>4) nclog(L"regReadKeys: Found %i tasker sub keys\n", iCount);
 
+	int iCount = 0;// = regCountSubKeys();
+	//+++ count number of subkeys
+		TCHAR* lpName = new TCHAR(MAX_PATH);
+		memset(lpName, 0, sizeof(TCHAR)*MAX_PATH);
+		DWORD dwCount = MAX_PATH*sizeof(TCHAR);
+		DWORD dwIdx=0;
+		while(RegEnumKeyEx(hKey, dwIdx, lpName, &dwCount, NULL, NULL, 0, NULL)==ERROR_SUCCESS){
+			if(_dbgLevel>4)
+				nclog(L"\tregReadKeys: found subkey '%s'\n", lpName);
+			memset(lpName, 0, sizeof(TCHAR)*MAX_PATH);
+			dwCount=MAX_PATH; //reset string length var
+			dwIdx++;
+		}
+	iCount=dwIdx;
+	//--- count number of subkeys
+
+	if(iCount==0)
+	{
+		if(_dbgLevel>4) 
+			nclog(L"regReadKeys: No sub keys found\n");
+		iRet=-2; //enum error
+		goto exit_readallkeys;
+	}
+	if(_dbgLevel>4) 
+		nclog(L"regReadKeys: Found %i tasker sub keys\n", iCount);
+
+	//not more than 10 tasks allowed
 	if(iCount>iMaxTasks)
 		iCount=iMaxTasks;
 
-	if(dwDbgLevel>4) nclog(L"regReadKeys: Allocating memory for %i tasks\n", iCount);
+	if(_dbgLevel>4) 
+		nclog(L"regReadKeys: Allocating memory for %i tasks\n", iCount);
 	for(int i=0; i<iMaxTasks; i++){
 		memset(_szRegSubKeys[i],0,sizeof(TCHAR)*MAX_PATH);
 	}
 	iTaskCount=iCount;
 
-	TCHAR szCurrentKey[MAX_PATH];
 	for(int i=0; i<iCount; i++){
 		int iRes=0;
 		wsprintf(_szRegSubKeys[i], L"Task%i", i+1);
+		wsprintf(_Tasks[i].szTaskKey, L"Task%i", i+1);	//save TaskX entry to structure
 
-		wsprintf(_Tasks[i].szTaskKey, L"Task%i", i+1);
 		//prepare subkey to read
-		wsprintf(szCurrentKey, L"%s\\%s", _szRegKey, _szRegSubKeys[i]);
-		OpenKey(szCurrentKey);
-		if(dwDbgLevel>4) 
-			nclog(L"regReadKeys: Processing task%i at '%s' ...\n", i, szCurrentKey);
+		wsprintf(subkey, L"%s\\%s", _szRegKey, _szRegSubKeys[i]);
+		rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS, &hKey);
+		if(rc!=0){
+			nclog(L"regReadKeys: RegOpenKey failed for task%i at '%s' with %i...\n", i, subkey, rc);
+			iRet=-3; //can not read subkey
+			goto exit_readallkeys;
+		}
+
+		if(_dbgLevel>4) 
+			nclog(L"regReadKeys: Processing task%i at '%s' ...\n", i, subkey);
 
 		//now we can read the values in each task key
-		TCHAR szTemp[MAX_PATH];
-		DWORD dwTemp=0;
-		if(RegReadDword(L"active", &dwTemp)==0){
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'active' entry is %i\n", dwTemp);
-			_Tasks[i].iActive=dwTemp;
+		DWORD dwVal=0;
+		TCHAR szVal[MAX_PATH];
+		DWORD dwSize=sizeof(DWORD);
+		DWORD dwType = REG_DWORD;
+		rc=RegQueryValueEx(hKey, L"active", 0, &dwType, (LPBYTE) &dwVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: 'active' entry is %i\n", dwVal);
+			_Tasks[i].iActive=dwVal;
 		}
 		else
 		{
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'active' entry, using 0 (inactive)\n");
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: error in read 'active' entry, using 0 (inactive)\n");
 			_Tasks[i].iActive=0;
 		}
 
-		OpenKey(szCurrentKey);
-		if(RegReadStr(L"exe", szTemp)==0){
-//			wsprintf(_ctasks[i]._task.szExeName, szTemp);
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'exe' entry is '%s'\n", szTemp);
-			wsprintf(_Tasks[i].szExeName, szTemp);
+		dwSize=sizeof(TCHAR)*MAX_PATH;
+		dwType=REG_SZ;
+		rc=RegQueryValueEx(hKey, L"exe", 0, &dwType, (LPBYTE) &szVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: 'exe' entry is '%s'\n", szVal);
+			wsprintf(_Tasks[i].szExeName, szVal);
 		}
 		else{
-			_Tasks[i].iActive = 0x10 + iRes;
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'exe' entry!\n");
-//			_ctasks[i]._task.iActive = 0x10 + iRes;
+			_Tasks[i].iActive = 0;
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: error in read 'exe' entry for '%s'!\n", subkey);
+			iRet=-4; //can not read exe entry
+			goto exit_readallkeys;
 		}
 
-		OpenKey(szCurrentKey);
-		if(RegReadStr(L"args", szTemp)==0){
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'args' entry is '%s'\n", szTemp);
-			wsprintf(_Tasks[i].szArgs, szTemp);
+		dwSize=sizeof(TCHAR)*MAX_PATH;
+		dwType=REG_SZ;
+		rc=RegQueryValueEx(hKey, L"args", 0, &dwType, (LPBYTE) &szVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: 'args' entry is '%s'\n", szVal);
+			wsprintf(_Tasks[i].szArgs, szVal);
 		}
 		else{
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'args' entry!\n");
+			if(_dbgLevel>4) nclog(L"\tregReadKeys: error in read 'args' entry!\n");
 			wsprintf(_Tasks[i].szArgs, L"");
 		}
 
 		SYSTEMTIME st;
-#if USE_NEXT_STARTSTOP
-		//changes for v2.1, try the new reg entry
-		if(RegReadStr(L"NextStart", szTemp)==0){
-			iRes=getSTfromLongString(&st, szTemp);
-			if(iRes==0)
-				_Tasks[i].stStartTime=st;
-			else
-				_Tasks[i].iActive = 0x50 + iRes;
-		}
-#endif
-//		else{
 		//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
-		OpenKey(szCurrentKey);
-			if(RegReadStr(L"start", szTemp)==0){
-				if(dwDbgLevel>4) 
-					nclog(L"\tregReadKeys: 'start' entry is '%s'\n", szTemp);
-				iRes=getSTfromString(&st, szTemp);
-				if(iRes==0){
-					_Tasks[i].stStartTime=fixSystemTime(st);
-					if(dwDbgLevel>4) 
-						nclog(L"\tregReadKeys: task.stStartTime entry set\n");
-				}
-				else{
-					if(dwDbgLevel>4) 
-						nclog(L"\tregReadKeys: task.stStartTime could not be set, iRes=%i\n", iRes);
-					_Tasks[i].iActive = 0x20 + iRes;
-				}
-			}
-			else
-			{
-				if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'start' entry\n");
-			}
-//		}
-
-#if USE_NEXT_STARTSTOP
-		//changes for v2.1, try the new reg entry
-		if(RegReadStr(L"NextStop", szTemp)==0){
-			iRes=getSTfromLongString(&st, szTemp);
-			if(iRes==0)
-				_Tasks[i].stStopTime=st;
-			else
-				_Tasks[i].iActive = 0x60 + iRes;
-		}
-#endif
-//		else{
-		//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
-		OpenKey(szCurrentKey);
-			if(RegReadStr(L"stop", szTemp)==0){
-				if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'stop' entry is '%s'\n", szTemp);
-				iRes=getSTfromString(&st, szTemp);
-				if(iRes==0){
-					if(dwDbgLevel>4) nclog(L"\tregReadKeys: task.stStopTime entry set\n");
-					_Tasks[i].stStopTime=fixSystemTime(st);
-				}
-				else{
-					_Tasks[i].iActive = 0x30 + iRes;
-					if(dwDbgLevel>4) nclog(L"\tregReadKeys: task.stStopTime could not be set, iRes=%i\n", iRes);
-				}
-			}
-			else
-			{
-				if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'stop' entry\n");
-			}
-//		}
-
-		OpenKey(szCurrentKey);
-		if(RegReadStr(L"interval", szTemp)==0){
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'interval' entry is '%s'\n", szTemp);
-			iRes=getSTfromString(&st, szTemp);
+		dwSize=sizeof(TCHAR)*MAX_PATH;
+		dwType=REG_SZ;
+		rc=RegQueryValueEx(hKey, L"start", 0, &dwType, (LPBYTE) &szVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: 'start' entry is '%s'\n", szVal);
+			iRes=getSTfromString(&st, szVal);
 			if(iRes==0){
-				if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'interval' using %02i:%02i\n", st.wHour, st.wMinute);
-				_Tasks[i].stDiffTime=st;
+				_Tasks[i].stStartTime=fixSystemTime(st);
+				if(_dbgLevel>4) 
+					nclog(L"\tregReadKeys: task.stStartTime entry set\n");
 			}
 			else{
-				if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'interval' entry. Using Active=FALSE\n");
-				_Tasks[i].iActive = 0x40 + iRes;
+				if(_dbgLevel>4) 
+					nclog(L"\tregReadKeys: task.stStartTime could not be set, iRes=%i\n", iRes);
+				_Tasks[i].iActive = 0;
+				iRet=-6; //can not read exe entry
+				goto exit_readallkeys;
 			}
 		}
 		else
 		{
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'interval' entry\n");
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: error in read 'start' entry\n");
+			iRet=-5; //can not read exe entry
+			goto exit_readallkeys;
 		}
-		if(_Tasks[i].iActive > 1)
-			iRet += _Tasks[i].iActive;	// we had errors
 
-		OpenKey(szCurrentKey);
+		//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
+		dwSize=sizeof(TCHAR)*MAX_PATH;
+		dwType=REG_SZ;
+		rc=RegQueryValueEx(hKey, L"stop", 0, &dwType, (LPBYTE) &szVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) nclog(L"\tregReadKeys: 'stop' entry is '%s'\n", szVal);
+			iRes=getSTfromString(&st, szVal);
+			if(iRes==0){
+				if(_dbgLevel>4) nclog(L"\tregReadKeys: task.stStopTime entry set\n");
+				_Tasks[i].stStopTime=fixSystemTime(st);
+			}
+			else{
+				_Tasks[i].iActive = 0;
+				if(_dbgLevel>4) 
+					nclog(L"\tregReadKeys: task.stStopTime could not be set, iRes=%i\n", iRes);
+				iRet=-8; //can not read exe entry
+				goto exit_readallkeys;
+			}
+		}
+		else
+		{
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: error in read 'stop' entry\n");
+			iRet=-7; //can not read exe entry
+			goto exit_readallkeys;
+		}
+
+		dwSize=sizeof(TCHAR)*MAX_PATH;
+		dwType=REG_SZ;
+		rc=RegQueryValueEx(hKey, L"interval", 0, &dwType, (LPBYTE) &szVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: 'interval' entry is '%s'\n", szVal);
+			iRes=getSTfromString(&st, szVal);
+			if(iRes==0){
+				if(_dbgLevel>4) 
+					nclog(L"\tregReadKeys: 'interval' using %02i:%02i\n", st.wHour, st.wMinute);
+				if(st.wHour==0 && st.wMinute==0 && st.wDay==0){ //interval 000000 not supported
+					_Tasks[i].iActive = 0;
+					iRet=-99; //can not read exe entry
+					goto exit_readallkeys;
+				}
+				_Tasks[i].stDiffTime=st;
+			}
+			else{
+				if(_dbgLevel>4) nclog(L"\tregReadKeys: error in read 'interval' entry. Using Active=FALSE\n");
+				_Tasks[i].iActive = 0;
+				iRet=-10; //can not read exe entry
+				goto exit_readallkeys;
+			}
+		}
+		else
+		{
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: error in read 'interval' entry\n");
+			iRet=-9; //can not read interval entry
+			goto exit_readallkeys;
+		}
+
 		//read startOnAConly
-		if(RegReadDword(L"startOnAConly", &dwTemp)==0){
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: 'startOnAConly' entry is %i\n", dwTemp);
-			if(dwTemp==1)
+		dwSize = sizeof(DWORD);
+		dwType = REG_DWORD;
+		rc=RegQueryValueEx(hKey, L"startOnAConly", 0, &dwType, (LPBYTE) &dwVal, &dwSize);
+		if(rc==0){
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: 'startOnAConly' entry is %i\n", dwVal);
+			if(dwVal==1)
 				_Tasks[i].bStartOnAConly=TRUE;
 			else
 				_Tasks[i].bStartOnAConly=FALSE;
 		}
 		else
 		{
-			if(dwDbgLevel>4) nclog(L"\tregReadKeys: error in read 'startOnAConly' entry. Using FALSE\n");
+			if(_dbgLevel>4) 
+				nclog(L"\tregReadKeys: error in read 'startOnAConly' entry. Using FALSE\n");
 			_Tasks[i].bStartOnAConly=FALSE;
 		}
-	}
+	}//for ... next
 
-//	_dwVersion = getVersion();
-
+exit_readallkeys:
+	RegCloseKey(hKey);
 	return iRet;
 }
 
 int regDisableTask(int iTask){
-	TCHAR szCurrentKey[MAX_PATH];
+	int iRes=0;
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
+	DWORD dwVal=0;
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
 	//set inactive
 	_Tasks[iTask].iActive=0;
 	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
+	wsprintf(subkey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
 
-	wsprintf(g_subkey, _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"Could not open %s\n", subkey);
+		iRes=-1;
+		goto exit_regDisableTask;
+	}
 
-	OpenKey(szCurrentKey);
-	int iRes=0;
-	DWORD dwVal=0;
-	if((iRes=RegWriteDword(L"active", &dwVal)) == 0)
+	rc = RegSetValueEx(	hKey, L"active", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
 		DEBUGMSG(1,(L"changed reg for task%i to inactive\n", iTask+1));
-	else
-		DEBUGMSG(1, (L"changing reg for task%i to inactive Failed: %i\n", iTask+1, iRes));
+	else{
+		DEBUGMSG(1, (L"changing reg for task%i to inactive Failed: %i\n", iTask+1, rc));
+		iRes=-2;
+	}
+
+exit_regDisableTask:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 	return iRes;
 }
 
 int regEnableTask(int iTask){
-	TCHAR szCurrentKey[MAX_PATH];
+	int iRes=0;
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
+	DWORD dwVal=1;
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
 	//set inactive
 	_Tasks[iTask].iActive=0;
 	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
+	wsprintf(subkey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
 
-	wsprintf(g_subkey, _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"Could not open %s\n", subkey);
+		iRes=-1;
+		goto exit_regEnableTask;
+	}
 
-	OpenKey(szCurrentKey);
-	int iRes=0;
-	DWORD dwVal=1;
-	if((iRes=RegWriteDword(L"active", &dwVal)) == 0)
-		DEBUGMSG(1,(L"changed reg for task%i to inactive\n", iTask+1));
-	else
-		DEBUGMSG(1, (L"changing reg for task%i to inactive Failed: %i\n", iTask+1, iRes));
+	rc = RegSetValueEx(	hKey, L"active", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
+		DEBUGMSG(1,(L"changed reg for task%i to active\n", iTask+1));
+	else{
+		DEBUGMSG(1, (L"changing reg for task%i to active Failed: %i\n", iTask+1, rc));
+		iRes=-2;
+	}
+
+exit_regEnableTask:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 	return iRes;
 }
 
 int regSetStartTime(int iTask, SYSTEMTIME pStartTime){
-	TCHAR szCurrentKey[MAX_PATH];
+	TCHAR subkey[MAX_PATH];
+	TCHAR szVal[MAX_PATH];
+	DWORD dwSize=0;
+	DWORD dwType=REG_SZ;
+	HKEY hKey=NULL;
 
 	//convert systemtime to HHmm
 	TCHAR* szHM = new TCHAR[4+1];
 	szHM = (TCHAR*)memset(szHM, 0, 4+1);
 	wsprintf(szHM, L"0000");
 	int iRet=0;
+
 	if((iRet=getStrFromSysTime(pStartTime, szHM))!=0)
-		return iRet;
+		goto exit_regSetStartTime;
+
 	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
+	wsprintf(subkey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"regSetStartTime: FATAL cannot open key '%s': %u\n", subkey, rc);
+		iRet=-1;
+		goto exit_regSetStartTime;
+	}
+	//change for v2.2: always only read start/start values and use NextStart and NextStart only as info
+	wsprintf(szVal, L"%s", szHM);
+	dwSize=wcslen(szHM)*sizeof(TCHAR);
+	dwType=REG_SZ;
 
-	int iRes=0;
-	DWORD dwVal=0;
+	rc = RegSetValueEx(hKey, L"start", 0, dwType, (LPBYTE)szVal, dwSize);
+	if(rc == 0)
+		DEBUGMSG(1, (L"regSetStartTime: OK. Debug Level is %s\n", szVal));
+	else{
+		DEBUGMSG(1, (L"regSetStartTime: FAILED %i\n", rc));
+	}
 
-//	if(_dwVersion<210L){
-		//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
-
-		if((iRes=RegWriteStr(L"start", szHM)) == 0)
-			DEBUGMSG(1,(L"changed start reg for task%i to '%s'\n", iTask+1, szHM));
-		else
-			DEBUGMSG(1, (L"changing start reg for task%i to '%s' Failed: %i\n", iTask+1, szHM, iRes));
-//	}
-
-	TCHAR sNextStart[13]; wsprintf(sNextStart, L"000000000000");
+	TCHAR sNextStart[13]; 
+	wsprintf(sNextStart, L"000000000000");
 	if(getLongStrFromSysTime(pStartTime, sNextStart)==0){
-		if((iRes=RegWriteStr(L"NextStart",sNextStart)) == 0){
-			DEBUGMSG(1,(L"changed NextStart reg for task%i to '%s'\n", iTask+1, sNextStart));
-			//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
-//			RegDelValue(L"start"); //delete obsolete value
-			iRes=10;
+		wsprintf(szVal, L"%s", sNextStart);
+		dwSize=wcslen(szVal);
+		rc = RegSetValueEx(hKey, L"NextStart", 0, dwType, (LPBYTE)szVal, dwSize);
+		if(rc == 0){
+			DEBUGMSG(1,(L"regSetStartTime: changed NextStart reg for task%i to '%s'\n", iTask+1, sNextStart));
+			iRet=10;
 		}
 		else
-			DEBUGMSG(1, (L"changing start reg for task%i to '%s' Failed: %i\n", iTask+1, sNextStart, iRes));
+			DEBUGMSG(1, (L"regSetStartTime: changing start reg for task%i to '%s' Failed: %i\n", iTask+1, szHM, rc));
 	}
 	else{
-		DEBUGMSG(1, (L"-getLongStrFromSysTime() failed\n"));
+		DEBUGMSG(1, (L"regSetStartTime: -getLongStrFromSysTime() failed\n"));
 	}
 
-	return iRes;
+exit_regSetStartTime:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
+	delete(szHM);
+	return iRet;
 }
 
 int regSetStopTime(int iTask, SYSTEMTIME pStopTime){
-	TCHAR szCurrentKey[MAX_PATH];
+	TCHAR subkey[MAX_PATH];
+	TCHAR szVal[MAX_PATH];
+	DWORD dwSize=0;
+	DWORD dwType=REG_SZ;
+	HKEY hKey=NULL;
 
 	//convert systemtime to HHmm
 	TCHAR* szHM = new TCHAR[4+1];
 	szHM = (TCHAR*)memset(szHM, 0, 4+1);
 	wsprintf(szHM, L"0000");
 	int iRet=0;
+
 	if((iRet=getStrFromSysTime(pStopTime, szHM))!=0)
-		return iRet;
+		goto exit_regSetStopTime;
+
 	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
-
-	int iRes=0;
-	DWORD dwVal=0;
-
+	wsprintf(subkey, L"%s\\%s", _szRegKey, _szRegSubKeys[iTask]);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"regSetStopTime: FATAL cannot open key '%s': %u\n", subkey, rc);
+		iRet=-1;
+		goto exit_regSetStopTime;
+	}
 	//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
-//	if(_dwVersion<210L){
-		if((iRes=RegWriteStr(L"stop", szHM)) == 0)
-			DEBUGMSG(1,(L"changed stop reg for task%i to '%s'\n", iTask+1, szHM));
-		else
-			DEBUGMSG(1, (L"changing stop reg for task%i to '%s' Failed: %i\n", iTask+1, szHM, iRes));
-//	}
+	wsprintf(szVal, L"%s", szHM);
+	dwSize=wcslen(szHM)*sizeof(TCHAR);
+	dwType=REG_SZ;
 
-	TCHAR sNextStop[13]; wsprintf(sNextStop, L"000000000000");
+	rc = RegSetValueEx(hKey, L"stop", 0, dwType, (LPBYTE)szVal, dwSize);
+	if(rc == 0)
+		DEBUGMSG(1, (L"regSetStopTime: OK. Debug Level is %s\n", szVal));
+	else{
+		DEBUGMSG(1, (L"regSetStopTime: FAILED %i\n", rc));
+	}
+
+	TCHAR sNextStop[13]; 
+	wsprintf(sNextStop, L"000000000000");
 	if(getLongStrFromSysTime(pStopTime, sNextStop)==0){
-		if((iRes=RegWriteStr(L"NextStop", sNextStop)) == 0){
-			DEBUGMSG(1,(L"changed NextStop reg for task%i to '%s'\n", iTask+1, sNextStop));
-				//change for v2.2: always only read start/stop values and use NextStart and NextStop only as info
-//				RegDelValue(L"stop"); //delete obsolete value
-			iRes=10;
+		wsprintf(szVal, L"%s", sNextStop);
+		dwSize=wcslen(szVal);
+		rc = RegSetValueEx(hKey, L"NextStop", 0, dwType, (LPBYTE)szVal, dwSize);
+		if(rc == 0){
+			DEBUGMSG(1,(L"regSetStopTime: changed NextStop reg for task%i to '%s'\n", iTask+1, sNextStop));
+			iRet=10;
 		}
 		else
-			DEBUGMSG(1, (L"changing NextStop reg for task%i to '%s' Failed: %i\n", iTask+1, sNextStop, iRes));
+			DEBUGMSG(1, (L"regSetStopTime: changing stop reg for task%i to '%s' Failed: %i\n", iTask+1, szHM, rc));
 	}
 	else{
-		DEBUGMSG(1, (L"-getLongStrFromSysTime() failed\n"));
+		DEBUGMSG(1, (L"regSetStopTime: -getLongStrFromSysTime() failed\n"));
 	}
 
-	return iRes;
+exit_regSetStopTime:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
+	delete(szHM);
+	return iRet;
 }
 
 BOOL getUpdateAll()
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=0;
-	if((iRes=RegReadDword(L"UpdateAll", &dwVal))==0){
-		if(dwVal==1){
-			DEBUGMSG(1, (L"UpdateAll is TRUE\n"));
-			return TRUE;
-		}
-		else{
-			DEBUGMSG(1, (L"UpdateAll is FALSE\n"));
-			return FALSE;
-		}
+	DWORD dwVal=0, dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+	DWORD dwReturn=FALSE;
+	TCHAR subkey[MAX_PATH];
+	//prepare subkey to read
+	HKEY hKey=NULL;
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"getUpdateAll: FATAL cannot open key '%s': %u. Using default 0\n", subkey, rc);
+		dwReturn=FALSE;
+		goto exit_getUpdateAll;
+	}
+	//read value
+	rc = RegQueryValueEx(hKey, L"UpdateAll", NULL, &dwType, (LPBYTE) &dwVal, &dwSize);
+
+	if(rc == 0){
+		DEBUGMSG(1, (L"getUpdateAll: OK. Version is %u\n", dwVal));
+		if(dwVal)
+			dwReturn=TRUE;
+		else
+			dwReturn=FALSE;
 	}
 	else{
-		DEBUGMSG(1, (L"UpdateAll ReadReg failed. Returning TRUE\n"));
-		return TRUE;
+		dwReturn=FALSE;
+		DEBUGMSG(1, (L"getUpdateAll: FAILED %u\n", rc));
 	}
+exit_getUpdateAll:
+	RegCloseKey(hKey);
+
 	setUpdateAll();
+
+	return dwReturn;
 }
 
 void setUpdateAll()
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=1;
-	if((iRes=RegWriteDword(L"UpdateAll", &dwVal))==0)
-		DEBUGMSG(1, (L"setUpdateAll: OK\n"));
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
+	DWORD dwVal=0;
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+
+	//prepare subkey to write
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"setUpdateAll: Could not write %s\n", subkey);
+		iRes=-1;
+		goto exit_setUpdateAll;
+	}
+
+	dwVal=1;
+	rc = RegSetValueEx(	hKey, L"UpdateAll", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
+		DEBUGMSG(1, (L"setUpdateAll: OK. Debug Level is %i\n", dwVal));
 	else
-		DEBUGMSG(1, (L"setUpdateAll: FAILED %i\n", iRes));
+		DEBUGMSG(1, (L"setUpdateAll: FAILED %i\n", rc));
+
+exit_setUpdateAll:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 }
 
 void unsetUpdateAll()
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
 	DWORD dwVal=0;
-	if((iRes=RegWriteDword(L"UpdateAll", &dwVal))==0)
-		DEBUGMSG(1, (L"setUpdateAll: OK\n"));
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+
+	//prepare subkey to write
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"unsetUpdateAll: Could not write %s\n", subkey);
+		iRes=-1;
+		goto exit_unsetUpdateAll;
+	}
+
+	dwVal=0;
+	rc = RegSetValueEx(	hKey, L"UpdateAll", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
+		DEBUGMSG(1, (L"unsetUpdateAll: OK. Debug Level is %i\n", dwVal));
 	else
-		DEBUGMSG(1, (L"setUpdateAll: FAILED %i\n", iRes));
+		DEBUGMSG(1, (L"unsetUpdateAll: FAILED %i\n", rc));
+
+exit_unsetUpdateAll:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 }
 
 DWORD getVersion()
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=0;
-	if((iRes=RegReadDword(L"Version", &dwVal))==0)
-		DEBUGMSG(1, (L"getVersion: OK. Version is %i\n", dwVal));
+	DWORD dwVal=0, dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+	DWORD dbgLevel=0;
+	TCHAR subkey[MAX_PATH];
+	//prepare subkey to read
+	HKEY hKey=NULL;
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"getVersion: FATAL cannot open key '%s': %u. Using default 0\n", subkey, rc);
+		dbgLevel=0;
+		goto exit_getVersion;
+	}
+	//read value
+	rc = RegQueryValueEx(hKey, L"Version", NULL, &dwType, (LPBYTE) &dwVal, &dwSize);
+
+	if(rc == 0){
+		DEBUGMSG(1, (L"getVersion: OK. Version is %u\n", dwVal));
+		dbgLevel=dwVal;
+	}
 	else{
 		dwVal=200L;
-		DEBUGMSG(1, (L"getVersion: FAILED %i\n", iRes));
+		DEBUGMSG(1, (L"getVersion: FAILED %u\n", rc));
 	}
+exit_getVersion:
+	RegCloseKey(hKey);
 	return dwVal;
 }
 
 int writeMaxDelay(UINT uDelay)
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to write
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=uDelay;
-	if((iRes=RegWriteDword(L"maxDelay", &dwVal))==0)
-		DEBUGMSG(1, (L"writeMaxDelay: OK. Version is %i\n", dwVal));
-	else
-		DEBUGMSG(1, (L"writeMaxDelay: FAILED %i\n", iRes));
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
+	DWORD dwVal=0;
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+
+	//prepare subkey to write
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"Could not write %s\n", subkey);
+		iRes=-1;
+		goto exit_writeMaxDelay;
+	}
+
+	dwVal=uDelay;
+	rc = RegSetValueEx(	hKey, L"maxDelay", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
+		DEBUGMSG(1, (L"writeMaxDelay: OK. Debug Level is %i\n", dwVal));
+	else{
+		DEBUGMSG(1, (L"writeMaxDelay: FAILED %i\n", rc));
+		iRes=-2;
+	}
+
+exit_writeMaxDelay:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 	return iRes;
 }
 
@@ -623,39 +847,66 @@ int writeMaxDelay(UINT uDelay)
 	read max allowed DeltaTime for ecognizing a delayed schedule
 */
 int getMaxDelay(){
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to read
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=0;
-	if((iRes=RegReadDword(L"maxDelay", &dwVal))==0)
-		DEBUGMSG(1, (L"getMaxDelay: OK. maxDelay is %i\n", dwVal));
-	else{
-		dwVal=1;
-		DEBUGMSG(1, (L"getMaxDelay: FAILED %i\n", iRes));
-		writeMaxDelay(dwVal);
+	DWORD dwVal=0, dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+	DWORD dwReturn=0;
+	TCHAR subkey[MAX_PATH];
+	//prepare subkey to read
+	HKEY hKey=NULL;
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey);
+	if (rc != ERROR_SUCCESS){
+		nclog(L"getMaxDelay: FATAL cannot open key '%s': %u. Using default 1\n", subkey, rc);
+		dwReturn=1;
+		goto exit_regReadDbgLevel;
 	}
-	return dwVal;
+	//read value
+	rc = RegQueryValueEx(hKey, L"maxDelay", NULL, &dwType, (LPBYTE) &dwVal, &dwSize);
+
+	if(rc == 0){
+		DEBUGMSG(1, (L"getMaxDelay: OK. dbglevel is %u\n", dwVal));
+		dwReturn=dwVal;
+	}
+	else{
+		dwReturn=1;
+		DEBUGMSG(1, (L"getMaxDelay: FAILED %u. Using default 1\n", rc));
+	}
+exit_regReadDbgLevel:
+	RegCloseKey(hKey);
+	return dwReturn;
 }
 
 int writeVersion(DWORD newVersion)
 {
-	TCHAR szCurrentKey[MAX_PATH];
-	//prepare subkey to write
-	wsprintf(szCurrentKey, L"%s", _szRegKey);
-	wsprintf(g_subkey, _szRegKey);
-	OpenKey(szCurrentKey);
 	int iRes=0;
-	DWORD dwVal=newVersion;
-	if((iRes=RegWriteDword(L"Version", &dwVal))==0)
+	TCHAR subkey[MAX_PATH];
+	HKEY hKey=NULL;
+	DWORD dwVal=0;
+	DWORD dwSize=sizeof(DWORD);
+	DWORD dwType = REG_DWORD;
+
+	//prepare subkey to write
+	wsprintf(subkey, L"%s", _szRegKey);
+	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_SET_VALUE | KEY_QUERY_VALUE, &hKey);
+	if(rc != 0){
+		nclog(L"writeVersion: Could not write %s\n", subkey);
+		iRes=-1;
+		goto exit_writeVersion;
+	}
+
+	dwVal=newVersion;
+	rc = RegSetValueEx(	hKey, L"Version", NULL, dwType, (LPBYTE) &dwVal, dwSize); 
+
+	if(rc == 0)
 		DEBUGMSG(1, (L"writeVersion: OK. Version is %i\n", dwVal));
 	else
-		DEBUGMSG(1, (L"writeVersion: FAILED %i\n", iRes));
+		DEBUGMSG(1, (L"writeVersion: FAILED %i\n", rc));
+
+exit_writeVersion:
+	if(hKey!=NULL)
+		RegFlushKey(hKey);
+	RegCloseKey(hKey);
 	return iRes;
 }
 
-void updateRegV2(){
-
-}

@@ -4,6 +4,9 @@
 
 Tasker2 - a tool to schedule start and kill applications
 
+v2.29
+	regRW.cpp: changed all access to registry.h/cpp and use direct reg access
+	
 v2.28
 	added nclog msg in RegReadAll, depends on new registry key DbgLevel. RegReadAll uses dbgLevel>4
 	added regReadDbgLevel to control which msgs are logged, currently dbgLevel=5 will make RegRead msgs visible

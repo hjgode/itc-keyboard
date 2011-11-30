@@ -214,10 +214,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\registry.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\regRW.cpp"
 				>
 			</File>
@@ -257,10 +253,6 @@
 			</File>
 			<File
 				RelativePath=".\common\nclog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\registry.h"
 				>
 			</File>
 			<File
