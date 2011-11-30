@@ -6,6 +6,9 @@ Tasker2 - a tool to schedule start and kill applications
 
 v2.29
 	regRW.cpp: changed all access to registry.h/cpp and use direct reg access
+	changed for APP_RUN_AFTER_TIME_CHANGE and APP_RUN_AFTER_TZ_CHANGE:
+		reinit used current time
+		check again for valid Date
 	
 v2.28
 	added nclog msg in RegReadAll, depends on new registry key DbgLevel. RegReadAll uses dbgLevel>4

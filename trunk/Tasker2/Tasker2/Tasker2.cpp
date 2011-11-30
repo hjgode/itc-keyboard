@@ -302,6 +302,27 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		else if(wcsicmp(argv[1], APP_RUN_AFTER_TIME_CHANGE)==0 || wcsicmp(argv[1], APP_RUN_AFTER_TZ_CHANGE)==0){
 			nclog(L"got '%s' signaled\n", argv[1]);
+
+				//better to reread the current time we work with, possibly we have been blocked
+				GetLocalTime(&stNow);
+				//clean up
+				stNow.wSecond=0;
+				stNow.wMilliseconds=0;
+				memcpy(&g_CurrentStartTime, &stNow, sizeof(SYSTEMTIME));
+
+			//now again check if we have a valid date
+
+				//check if date/time is valid
+				nclog(L"Checking for valid date/time...\n");
+				if( (stNow.wYear*100 + stNow.wMonth) < 201111){
+					nclog(L"scheduling event notifications\n");
+					//clear and renew all event notifications
+					RunAppAtTimeChangeEvents(szTaskerEXE);
+					nclog(L"Date/Time not valid!\n*********** END ************\n");
+					return 0xBADCAB1E;
+				}
+				nclog(L"Date/Time after 11 2011. OK\n");
+
 			//schedule all active tasks
 			int iCount = scheduleAllTasks();
 			nclog(L"Scheduled %i Tasks\n", iCount);
