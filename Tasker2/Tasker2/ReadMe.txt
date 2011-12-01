@@ -4,6 +4,11 @@
 
 Tasker2 - a tool to schedule start and kill applications
 
+v2.30
+	changed getSTfromString to not return an error for '0000' (start/stop times)
+	changed createNextSchedule to use createDelayedNextSchedule
+	changed regReadDbgLevel to write always 0 as dbgLevel
+	
 v2.29
 	regRW.cpp: changed all access to registry.h/cpp and use direct reg access
 	changed for APP_RUN_AFTER_TIME_CHANGE and APP_RUN_AFTER_TZ_CHANGE:
