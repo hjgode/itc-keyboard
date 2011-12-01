@@ -10,7 +10,7 @@
 TASK _Tasks[iMaxTasks];
 int iTaskCount=0;
 
-DWORD _dwVersion = 229L;
+DWORD _dwVersion = 230L;
 int _dbgLevel = 0;
 
 static TCHAR* _szRegKey = L"Software\\tasker";
@@ -40,8 +40,9 @@ int getSTfromString(SYSTEMTIME* sysTime /*in,out*/, TCHAR* sStr /*in*/){
 	memcpy(sysTime, &g_CurrentStartTime, sizeof(SYSTEMTIME));
 	//GetLocalTime(sysTime); //v2.28
 	int iTime = _wtoi(sStr);
-	if(iTime == 0)
-		return -2;	//string not a number
+	//v2.30: removed testing if 0
+	//if(iTime == 0)
+	//	return -2;	//string not a number
 	int iHour = iTime/100;
 	int iMinute = iTime % 100;
 	sysTime->wHour=iHour;
@@ -247,7 +248,7 @@ DWORD regReadDbgLevel(){
 	}
 exit_regReadDbgLevel:
 	RegCloseKey(hKey);
-	regWriteDbgLevel(0);
+	regWriteDbgLevel(_dbgLevel);
 	return _dbgLevel;
 }
 
@@ -273,9 +274,12 @@ int regReadKeys(){
 		memset(lpName, 0, sizeof(TCHAR)*MAX_PATH);
 		DWORD dwCount = MAX_PATH*sizeof(TCHAR);
 		DWORD dwIdx=0;
+		TCHAR szStr[MAX_PATH];
 		while(RegEnumKeyEx(hKey, dwIdx, lpName, &dwCount, NULL, NULL, 0, NULL)==ERROR_SUCCESS){
-			if(_dbgLevel>4)
-				nclog(L"\tregReadKeys: found subkey '%s'\n", lpName);
+			if(_dbgLevel>5){
+				wcscpy(szStr, lpName);
+				nclog(L"\tregReadKeys: found subkey '%s'\n", szStr);
+			}
 			memset(lpName, 0, sizeof(TCHAR)*MAX_PATH);
 			dwCount=MAX_PATH; //reset string length var
 			dwIdx++;
@@ -406,7 +410,8 @@ int regReadKeys(){
 			if(_dbgLevel>4) nclog(L"\tregReadKeys: 'stop' entry is '%s'\n", szVal);
 			iRes=getSTfromString(&st, szVal);
 			if(iRes==0){
-				if(_dbgLevel>4) nclog(L"\tregReadKeys: task.stStopTime entry set\n");
+				if(_dbgLevel>4) 
+					nclog(L"\tregReadKeys: task.stStopTime entry set\n");
 				_Tasks[i].stStopTime=fixSystemTime(st);
 			}
 			else{
@@ -437,6 +442,7 @@ int regReadKeys(){
 					nclog(L"\tregReadKeys: 'interval' using %02i:%02i\n", st.wHour, st.wMinute);
 				if(st.wHour==0 && st.wMinute==0 && st.wDay==0){ //interval 000000 not supported
 					_Tasks[i].iActive = 0;
+					nclog(L"interval = 0 is NOT supported\n");
 					iRet=-99; //can not read exe entry
 					goto exit_readallkeys;
 				}

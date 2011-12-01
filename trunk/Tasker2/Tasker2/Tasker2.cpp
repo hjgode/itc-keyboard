@@ -87,7 +87,7 @@ int scheduleAllTasks(){
 				shHour = (short) (shHour % 24);
 			}				
 
-			stNewTime = createNextSchedule(stNewTime,shDays, shHour, shMin);
+			stNewTime = createNextSchedule(stNewTime, shDays, shHour, shMin);
 			//if(!isNewer(stNewTime, stCurrentTime)){
 			//	while(!isNewer(stNewTime, stCurrentTime)){
 			//		stNewTime = DT_Add(stNewTime, 0, 0, shDays, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
@@ -633,6 +633,10 @@ void dumpST(SYSTEMTIME st){
 	return time of next schedule in future that meets the given interval
 */
 SYSTEMTIME createNextSchedule(SYSTEMTIME stNext, short shDays, short shHour, short shMin){
+	
+	//v2.30, always test for delayed schedule
+	return createDelayedNextSchedule(stNext, shDays, shHour, shMin);
+
 	//SYSTEMTIME stCurrentTime;
 	//GetLocalTime(&stCurrentTime);
 	
