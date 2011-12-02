@@ -47,7 +47,7 @@
 	int regEnableTask(int iTask);
 	int regSetStartTime(int iTask, SYSTEMTIME pStartTime);
 	int regSetStopTime(int iTask, SYSTEMTIME pStartTime);
-	void setUpdateAll();
-	void unsetUpdateAll();
-	BOOL getUpdateAll();
+//	void setUpdateAll();
+//	void unsetUpdateAll();
+//	BOOL getUpdateAll();
 #endif

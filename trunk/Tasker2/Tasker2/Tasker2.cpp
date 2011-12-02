@@ -45,6 +45,9 @@ BOOL isACpowered(){
 }
 
 int ClearAllSchedules(){
+	//clear all event schedules
+	ClearRunAppAtTimeChangeEvents(szTaskerEXE);
+
 	//clear all task schedules
 	int iRes = notiClearRunApp(szTaskerEXE);
 	nclog(L"Cleared %i Tasker schedules\n", iRes);
@@ -67,7 +70,7 @@ int scheduleAllTasks(){
 	{
 		int iTask = i;
 		if(_Tasks[iTask].iActive==1){
-			//create a new schedule cmd line for tasker
+			//################ create a new START schedule cmd line for tasker
 			TCHAR strTaskCmdLine[MAX_PATH];
 
 			//create a new START schedule with new time
@@ -98,13 +101,9 @@ int scheduleAllTasks(){
 				iRet++;
 
 			////save new start time
-			BOOL bUpdateAll=getUpdateAll();
-			bUpdateAll=TRUE;
+			regSetStartTime(iTask, stNewTime);
 
-			if(bUpdateAll)
-				regSetStartTime(iTask, stNewTime);
-
-			//create a new kill schedule for taskX
+			//################ create a new KILL schedule for taskX
 			wsprintf(strTaskCmdLine, L"-k task%i", iTask+1); //the cmdLine for tasker.exe for this task	
 			nclog(L"Creating new Kill Task schedule for '%s' in Task%i\n", _Tasks[iTask].szExeName, iTask+1);
 			shHour	=	_Tasks[iTask].stDiffTime.wHour;
@@ -127,11 +126,8 @@ int scheduleAllTasks(){
 				iRet++;
 				
 			////save new changed stoptime
-			if(bUpdateAll)
-				regSetStopTime(iTask, stNewTime);
+			regSetStopTime(iTask, stNewTime);
 
-			if(bUpdateAll)
-				unsetUpdateAll();
 		}
 	}
 	nclog(L"scheduleAllTasks: scheduled %i new tasks\n", iRet);
@@ -233,6 +229,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	for(int x=1; x<argc; x++){
 		nclog(L"\targv[%i]: '%s\n", x, argv[x]);
 	}
+
+	//##################### use only one current start time #############################
 	//v2.28: use only one current time, the time the exe has been started
 	memcpy(&g_CurrentStartTime, &stNow, sizeof(SYSTEMTIME));
 

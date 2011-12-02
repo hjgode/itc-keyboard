@@ -4,6 +4,9 @@
 
 Tasker2 - a tool to schedule start and kill applications
 
+v2.32
+	removed UpdateAll codes
+	
 v2.31
 	reversed change of createNextSchedule
 	

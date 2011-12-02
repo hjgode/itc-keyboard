@@ -471,15 +471,28 @@ HRESULT notiClearRunApp(LPCTSTR szExeName)
 }
 
 /*
+	clear all event based schedules
+*/
+int ClearRunAppAtTimeChangeEvents(TCHAR FileName[MAX_PATH+1]){
+	int iRet = 0;
+	nclog(L"Clearing Event Notifications...");
+	if(CeRunAppAtEvent(FileName, NOTIFICATION_EVENT_NONE)){
+		nclog(L"OK\n");
+	}
+	else{
+		iRet=GetLastError();
+		nclog(L"Failed: %i\n", iRet);
+	}
+	return iRet;
+}
+
+/*
 	delete and create new Time_Change and TZ_Change notifications
 */
 int RunAppAtTimeChangeEvents(TCHAR FileName[MAX_PATH+1]){
 	int iRet = 0;
 	nclog(L"Clearing Event Notifications...");
-	if(CeRunAppAtEvent(FileName, NOTIFICATION_EVENT_NONE))
-		nclog(L"OK\n");
-	else
-		nclog(L"Failed: %i\n", GetLastError());
+	ClearRunAppAtTimeChangeEvents(FileName);
 
 	nclog(L"Adding Time_Change Event Notification...");
 	if(CeRunAppAtEvent(FileName, NOTIFICATION_EVENT_TIME_CHANGE))
