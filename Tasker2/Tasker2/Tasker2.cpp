@@ -1,5 +1,8 @@
 // Tasker2.cpp : Defines the entry point for the console application.
 //
+// use test mode to disable the creation of new schedules and control 
+// everything with just calling Tasker2 with args manually
+//#define TESTMODE
 
 #include "stdafx.h"
 #include "task.h"
@@ -46,10 +49,12 @@ BOOL isACpowered(){
 
 int ClearAllSchedules(){
 	//clear all event schedules
+	int iRes=0;
+#ifndef TESTMODE
 	ClearRunAppAtTimeChangeEvents(szTaskerEXE);
-
 	//clear all task schedules
-	int iRes = notiClearRunApp(szTaskerEXE);
+	iRes = notiClearRunApp(szTaskerEXE);
+#endif
 	nclog(L"Cleared %i Tasker schedules\n", iRes);
 	return iRes;
 }
@@ -61,8 +66,9 @@ int scheduleAllTasks(){
 	nclog(L"scheduleAllTasks: ClearAllSchedules for %i tasks\n", iRet);
 	
 	//clear and renew all event notifications
+#ifndef TESTMODE
 	RunAppAtTimeChangeEvents(szTaskerEXE);
-
+#endif
 	iRet=0;
 
 	//create new KILL and START schedules
@@ -91,15 +97,10 @@ int scheduleAllTasks(){
 			}				
 
 			stNewTime = createNextSchedule(stNewTime, shDays, shHour, shMin);
-			//if(!isNewer(stNewTime, stCurrentTime)){
-			//	while(!isNewer(stNewTime, stCurrentTime)){
-			//		stNewTime = DT_Add(stNewTime, 0, 0, shDays, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
-			//	}
-			//	nclog(L"\tstart task %i rescheduled to %s\n", iTask, getLongStrFromSysTime2(stNewTime));
-			//}
+#ifndef TESTMODE
 			if(ScheduleRunApp(szTaskerEXE, strTaskCmdLine, stNewTime)==0)
 				iRet++;
-
+#endif
 			////save new start time
 			regSetStartTime(iTask, stNewTime);
 
@@ -117,14 +118,10 @@ int scheduleAllTasks(){
 			}				
 
 			stNewTime = createNextSchedule(stNewTime,shDays, shHour, shMin);
-			//if(!isNewer(stNewTime, stCurrentTime)){
-			//	stNewTime = DT_Add(_Tasks[iTask].stStopTime, 0, 0, shDays, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
-			//	nclog(L"\tstop task %i rescheduled to %s\n", iTask, getLongStrFromSysTime2(stNewTime));
-			//}
-
+#ifndef TESTMODE
 			if(ScheduleRunApp(szTaskerEXE, strTaskCmdLine, stNewTime)==0)
 				iRet++;
-				
+#endif				
 			////save new changed stoptime
 			regSetStopTime(iTask, stNewTime);
 
@@ -190,6 +187,9 @@ int _tmain(int argc, _TCHAR* argv[])
 #ifdef DEBUG
 	nclog(L"             DEBUG BUILD !\n");
 #endif
+#ifdef TESTMODE
+	nclog(L"             TESTMODE !\n");
+#endif
 	//##################### dont run if already running #############################
 	nclog(L"Checking for Mutex (single instance allowed only)...\n");
 
@@ -221,13 +221,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	stNow.wSecond=0;
 	stNow.wMilliseconds=0;
 
-	nclog(L"%02i.%02i.%04i, %02i:%02i\n",
+	nclog(L"Using launch time %02i.%02i.%04i, %02i:%02i\n",
 		stNow.wDay, stNow.wMonth, stNow.wYear,
 		stNow.wHour, stNow.wMinute);
 
 	nclog(L"CmdLine = \n");
 	for(int x=1; x<argc; x++){
-		nclog(L"\targv[%i]: '%s\n", x, argv[x]);
+		nclog(L"\targv[%i]: '%s'\n", x, argv[x]);
 	}
 
 	//##################### use only one current start time #############################
@@ -257,7 +257,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	if( (stNow.wYear*100 + stNow.wMonth) < 201111){
 		nclog(L"scheduling event notifications\n");
 		//clear and renew all event notifications
+#ifndef TESTMODE
 		RunAppAtTimeChangeEvents(szTaskerEXE);
+#endif
 		nclog(L"Date/Time not valid!\n*********** END ************\n");
 		return 0xBADDA1E;
 	}
@@ -315,7 +317,9 @@ int _tmain(int argc, _TCHAR* argv[])
 				if( (stNow.wYear*100 + stNow.wMonth) < 201111){
 					nclog(L"scheduling event notifications\n");
 					//clear and renew all event notifications
+#ifndef TESTMODE
 					RunAppAtTimeChangeEvents(szTaskerEXE);
+#endif
 					nclog(L"Date/Time not valid!\n*********** END ************\n");
 					return 0xBADCAB1E;
 				}
@@ -401,8 +405,9 @@ int _tmain(int argc, _TCHAR* argv[])
 			stNewTime = createNextSchedule(stNewTime, shDays, shHour, shMin);
 			//stNewTime = DT_Add(_Tasks[iTask].stStartTime, 0, 0, 0, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
 			
+#ifndef TESTMODE
 			ScheduleRunApp(szTaskerEXE, strTaskCmdLine, stNewTime);
-			
+#endif			
 			//the new kill task
 			wsprintf(strTaskCmdLine, L"-k task%i", iTask+1); //the KILL cmdLine for tasker.exe for this task	
 
@@ -421,8 +426,9 @@ int _tmain(int argc, _TCHAR* argv[])
 				stNewTime=_Tasks[iTask].stStopTime;
 				stNewTime=createNextSchedule(stNewTime, shDays, shHour, shMin);
 				//stNewTime = DT_Add(_Tasks[iTask].stStopTime, 0, 0, 0, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
+#ifndef TESTMODE
 				ScheduleRunApp(szTaskerEXE, strTaskCmdLine, stNewTime);
-
+#endif
 			_Tasks[iTask].iActive=1;
 			//write change to registry
 			nclog(L"Setting Task%i to active\n", iTask+1);
@@ -505,14 +511,24 @@ int processStartStopCmd(TCHAR* argv[]){
 
 		nclog(L"current time = '%s'\n", getLongStrFromSysTime2(g_CurrentStartTime));
 		nclog(L"interval is: %id%02ih%02im\n", shDays, shHour, shMin);
+		nclog(L"\tdelta is %i minutes\n", iDeltaMinutes);
 
-		if(thisTaskType==stopTask)
-			nclog(L"\tdelta is %i minutes\n\tcreating new kill schedule\n", iDeltaMinutes);
-		else
-			nclog(L"\tdelta is %i minutes\n\tcreating new start schedule\n", iDeltaMinutes);
+		//started BEFORE scheduled time, iDelta is negative
+		if(iDeltaMinutes<0){
+			if(thisTaskType==stopTask)
+				stNewTime=_Tasks[iTask].stStopTime;
+			else
+				stNewTime=_Tasks[iTask].stStartTime;
+#ifndef TESTMODE
+			ScheduleRunApp(szTaskerEXE, strTaskCmdLine, stNewTime);
+#endif
+			nclog(L"*** re-scheduled future task *** \n");
+			return 0;
+		}
 
 		int iMaxDelay = getMaxDelay();
-		nclog(L"\tmax allowed diff for delayed schedule recognition is %i\n", iMaxDelay);
+		nclog(L"\tmax allowed diff for delayed schedule recognition is plus %i\n", iMaxDelay);
+
 		if( iDeltaMinutes > iMaxDelay ) //is the time diff greater than 1 minute
 		{
 			bIsDelayedSchedule = TRUE;
@@ -555,8 +571,9 @@ int processStartStopCmd(TCHAR* argv[]){
 
 		//create a new kill or start schedule with new time
 		nclog(L"Creating new schedule for '%s' in Task%i\n", _Tasks[iTask].szExeName, iTask+1);
+#ifndef TESTMODE
 		ScheduleRunApp(szTaskerEXE, strTaskCmdLine, stNewTime);
-
+#endif
 		//save new changed stop/start ime
 		if(thisTaskType==stopTask)
 			regSetStopTime(iTask, stNewTime);
@@ -664,8 +681,8 @@ SYSTEMTIME createNextSchedule(SYSTEMTIME stNext, short shDays, short shHour, sho
 			//add interval to stNewTime
 			stNext = DT_Add(stNext, 0, 0, shDays, shHour, shMin, 0, 0);// DT_AddDay(_Tasks[iTask].stStartTime);
 		}while (!isNewer(stNext, g_CurrentStartTime));
-		nclog(L"\tschedule adjusted to '%s'\n", getLongStrFromSysTime2(stNext));
 	}
+	nclog(L"\tschedule adjusted to '%s'\n", getLongStrFromSysTime2(stNext));
 	//else
 	//	nclog(L"\tno schedule adjustement needed.\n");
 

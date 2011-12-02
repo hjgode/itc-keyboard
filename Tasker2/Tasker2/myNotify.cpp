@@ -151,6 +151,7 @@ double minutes_between(const FILETIME & from, const FILETIME & to)
 		return double((*(__int64 *) & from) - (*(__int64 *) & to)) / TICKS_PER_DAY;
 }
 
+// test if st1 is before st2(current time)
 int /*int*/ stDeltaMinutes(const SYSTEMTIME st1, const SYSTEMTIME st2)
 {
 	int iDelta=0;
@@ -163,10 +164,12 @@ int /*int*/ stDeltaMinutes(const SYSTEMTIME st1, const SYSTEMTIME st2)
 
 	DWORD dwMin1 = st1.wHour * 60 + st1.wMinute;
 	DWORD dwMin2 = st2.wHour * 60 + st2.wMinute;
-	if(dwMin1>dwMin2)
-		iDelta = dwMin1-dwMin2;
-	else
-		iDelta = dwMin2-dwMin1;
+	//if(dwMin1>dwMin2)
+	//	iDelta = dwMin1-dwMin2;
+	//else
+	//	iDelta = dwMin2-dwMin1;
+	iDelta = dwMin2 - dwMin1; //uhrzeit 2 ist später als uhrzeit 1 dann positiv (delayed schedule)
+
 	DEBUGMSG(1, (L"DEBUG: Time diff in minutes: %i\n", iDelta));
     return iDelta;// abs(iTimeDelta/60);
 }

@@ -286,6 +286,10 @@
 			RelativePath=".\Tasker2.exe.log.txt"
 			>
 		</File>
+		<File
+			RelativePath=".\TestScenario.txt"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
