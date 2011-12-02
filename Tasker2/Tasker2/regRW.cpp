@@ -10,7 +10,7 @@
 TASK _Tasks[iMaxTasks];
 int iTaskCount=0;
 
-DWORD _dwVersion = 231L;
+DWORD _dwVersion = 232L;
 int _dbgLevel = 0;
 
 static TCHAR* _szRegKey = L"Software\\tasker";
@@ -680,43 +680,43 @@ exit_regSetStopTime:
 	return iRet;
 }
 
-BOOL getUpdateAll()
-{
-	int iRes=0;
-	DWORD dwVal=0, dwSize=sizeof(DWORD);
-	DWORD dwType = REG_DWORD;
-	DWORD dwReturn=FALSE;
-	TCHAR subkey[MAX_PATH];
-	//prepare subkey to read
-	HKEY hKey=NULL;
-	wsprintf(subkey, L"%s", _szRegKey);
-	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey);
-	if (rc != ERROR_SUCCESS){
-		nclog(L"getUpdateAll: FATAL cannot open key '%s': %u. Using default 0\n", subkey, rc);
-		dwReturn=FALSE;
-		goto exit_getUpdateAll;
-	}
-	//read value
-	rc = RegQueryValueEx(hKey, L"UpdateAll", NULL, &dwType, (LPBYTE) &dwVal, &dwSize);
-
-	if(rc == 0){
-		DEBUGMSG(1, (L"getUpdateAll: OK. Version is %u\n", dwVal));
-		if(dwVal)
-			dwReturn=TRUE;
-		else
-			dwReturn=FALSE;
-	}
-	else{
-		dwReturn=FALSE;
-		DEBUGMSG(1, (L"getUpdateAll: FAILED %u\n", rc));
-	}
-exit_getUpdateAll:
-	RegCloseKey(hKey);
-
-	setUpdateAll();
-
-	return dwReturn;
-}
+//BOOL getUpdateAll()
+//{
+//	int iRes=0;
+//	DWORD dwVal=0, dwSize=sizeof(DWORD);
+//	DWORD dwType = REG_DWORD;
+//	DWORD dwReturn=FALSE;
+//	TCHAR subkey[MAX_PATH];
+//	//prepare subkey to read
+//	HKEY hKey=NULL;
+//	wsprintf(subkey, L"%s", _szRegKey);
+//	LONG rc = RegOpenKeyEx(HKEY_LOCAL_MACHINE, subkey, 0, KEY_QUERY_VALUE, &hKey);
+//	if (rc != ERROR_SUCCESS){
+//		nclog(L"getUpdateAll: FATAL cannot open key '%s': %u. Using default 0\n", subkey, rc);
+//		dwReturn=FALSE;
+//		goto exit_getUpdateAll;
+//	}
+//	//read value
+//	rc = RegQueryValueEx(hKey, L"UpdateAll", NULL, &dwType, (LPBYTE) &dwVal, &dwSize);
+//
+//	if(rc == 0){
+//		DEBUGMSG(1, (L"getUpdateAll: OK. Version is %u\n", dwVal));
+//		if(dwVal)
+//			dwReturn=TRUE;
+//		else
+//			dwReturn=FALSE;
+//	}
+//	else{
+//		dwReturn=FALSE;
+//		DEBUGMSG(1, (L"getUpdateAll: FAILED %u\n", rc));
+//	}
+//exit_getUpdateAll:
+//	RegCloseKey(hKey);
+//
+//	setUpdateAll();
+//
+//	return dwReturn;
+//}
 
 void setUpdateAll()
 {

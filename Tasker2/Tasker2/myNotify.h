@@ -37,6 +37,7 @@ HRESULT notiClearRunApp(LPCTSTR );
 int RunAppAtTime(TCHAR FileName[MAX_PATH+1]);
 int RunAppAtTime(TCHAR FileName[MAX_PATH+1], SYSTEMTIME nextTime);
 
+int ClearRunAppAtTimeChangeEvents(TCHAR FileName[MAX_PATH+1]);
 int RunAppAtTimeChangeEvents(TCHAR FileName[MAX_PATH+1]);
 
 HRESULT ScheduleRunApp(LPCTSTR szExeName, LPCTSTR szArgs, SYSTEMTIME stTime);
