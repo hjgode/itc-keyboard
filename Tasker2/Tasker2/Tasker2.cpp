@@ -635,7 +635,7 @@ void dumpST(SYSTEMTIME st){
 SYSTEMTIME createNextSchedule(SYSTEMTIME stNext, short shDays, short shHour, short shMin){
 	
 	//v2.30, always test for delayed schedule
-	return createDelayedNextSchedule(stNext, shDays, shHour, shMin);
+	//v2.31 removed 	//return createDelayedNextSchedule(stNext, shDays, shHour, shMin);
 
 	//SYSTEMTIME stCurrentTime;
 	//GetLocalTime(&stCurrentTime);
