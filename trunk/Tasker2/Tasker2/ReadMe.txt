@@ -4,6 +4,29 @@
 
 Tasker2 - a tool to schedule start and kill applications
 
+v2.31
+	reversed change of createNextSchedule
+	
+	correct reg format:
+		REGEDIT4
+
+		[HKLM\Software\Tasker]
+		"dbgLevel":DWORD=0
+		"maxDelay":DWORD=1
+		"Version":DWORD=231
+		
+		[HKLM\Software\Tasker\Task1]
+		"active":DWORD=1
+		"exe":="\Windows\fexplore.exe"
+		"args":="\My Documents"
+		"start":="0430"
+		"startOnAConly":DWORD=0;
+		"stop":="0530"
+		"interval" :="2400"
+		;informational use only:
+		"NextStart":="201111041430"
+		"NextStop" :="201111041530"
+
 v2.30
 	changed getSTfromString to not return an error for '0000' (start/stop times)
 	changed createNextSchedule to use createDelayedNextSchedule
