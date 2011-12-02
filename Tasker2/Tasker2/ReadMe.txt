@@ -4,6 +4,9 @@
 
 Tasker2 - a tool to schedule start and kill applications
 
+v2.33
+	added code to recognize pre-time launches, where the task to launch is in the future
+	
 v2.32
 	removed UpdateAll codes
 	
