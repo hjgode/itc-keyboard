@@ -598,7 +598,7 @@ int regSetStartTime(int iTask, SYSTEMTIME pStartTime){
 	wsprintf(sNextStart, L"000000000000");
 	if(getLongStrFromSysTime(pStartTime, sNextStart)==0){
 		wsprintf(szVal, L"%s", sNextStart);
-		dwSize=wcslen(szVal);
+		dwSize=sizeof(TCHAR)*wcslen(szVal);
 		rc = RegSetValueEx(hKey, L"NextStart", 0, dwType, (LPBYTE)szVal, dwSize);
 		if(rc == 0){
 			DEBUGMSG(1,(L"regSetStartTime: changed NextStart reg for task%i to '%s'\n", iTask+1, sNextStart));
@@ -659,7 +659,7 @@ int regSetStopTime(int iTask, SYSTEMTIME pStopTime){
 	wsprintf(sNextStop, L"000000000000");
 	if(getLongStrFromSysTime(pStopTime, sNextStop)==0){
 		wsprintf(szVal, L"%s", sNextStop);
-		dwSize=wcslen(szVal);
+		dwSize=sizeof(TCHAR)*wcslen(szVal);
 		rc = RegSetValueEx(hKey, L"NextStop", 0, dwType, (LPBYTE)szVal, dwSize);
 		if(rc == 0){
 			DEBUGMSG(1,(L"regSetStopTime: changed NextStop reg for task%i to '%s'\n", iTask+1, sNextStop));
