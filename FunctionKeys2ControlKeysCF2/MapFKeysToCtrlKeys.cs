@@ -39,7 +39,8 @@ namespace FunctionKeys2ControlKeys
 
         private void menuItem1_Click(object sender, EventArgs e)
         {
-            kdbTools.Dispose();
+            if(kdbTools!=null)
+                kdbTools.Dispose();
             this.Close();
         }
 

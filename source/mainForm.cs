@@ -23,8 +23,17 @@ namespace CUsbKeysCStest
 
         private void btnDirect_Click(object sender, EventArgs e)
         {
-            directKeysForm dDlg = new directKeysForm();
-            dDlg.ShowDialog();
+            try
+            {
+                directKeysForm dDlg = new directKeysForm();
+                dDlg.ShowDialog();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (Exception)
+            {
+            }
         }
 
         private void btnUSBkeys_Click(object sender, EventArgs e)
