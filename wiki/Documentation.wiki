@@ -10,9 +10,15 @@ This is the time where you may need this keyboard remapper class.
 = Background =
 
 The Intermec keyboards (newer devices) use binary registry keys for keyboard mapping. The itc-keyboard classes try to give you easy access to those keys and let you go beyond the intermec device resource kit keyboard remapper.
-The binary mapping registry keys are sequences of 6 or 4 bytes. In a six byte sequence, the first two bytes define the USB hardware key the mapping is associated with. These USB HID keynames reflect the normal printed hardware key of an intermec device. Unfortunately not all printed key names are available in the normal USB HID Keyboard name table and so the one or other keyname does not reflect the printed key. For example, the orange and aqua buttons names are not part of the USB HID keyboard key names.
+
+The binary mapping registry keys are sequences of 6 or 4 bytes. In a six byte sequence, the first two bytes define the USB hardware key the mapping is associated with. These USB HID keynames reflect the normal printed hardware key of an intermec device. Unfortunately not all printed key names are available in the normal USB HID Keyboard name table and so the one or other keyname does not reflect the printed key. 
+
+For example, the orange and aqua buttons names are not part of the USB HID keyboard key names.
+
 The 4 byte sequences are used inside Multikey tables in registry. Multikeys are defined by 4 byte sequences which define the keys emulated by pressing a key that is mapped to the multikey entry.
+
 The byte sequence definitions for keys can use either PS/2 key tables or the have the VKEY value.
+
 Other key mappings can point to multikeys, modifiers, shiftkeys and other tables.
 
 = Details =
