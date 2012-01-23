@@ -541,7 +541,7 @@ namespace ITC_KEYBOARD
             Keyboard_Intl_1 = 0x87,
             Keyboard_Intl_2 = 0x88,
             Keyboard_Intl_3 = 0x89,
-            OK = 0x8A,
+            Action_OK = 0x8A,
             Keyboard_Intl_5 = 0x8B,
             Keyboard_Intl_6 = 0x8C,
             Keyboard_Intl_7 = 0x8D,

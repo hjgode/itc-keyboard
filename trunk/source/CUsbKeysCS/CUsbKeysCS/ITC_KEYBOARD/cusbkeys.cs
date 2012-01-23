@@ -960,6 +960,16 @@ The 'type' and behaviour of the key is defined by the USBKeyFlags. There are thr
             return sMultikeys;
         }
         /// <summary>
+        /// read one multikey entry from registry
+        /// </summary>
+        /// <param name="iMKey">Multikey index (starting at 1) to read</param>
+        /// <returns>a string with the names of the multikey values</returns>
+        public string dumpMultiKey(int iMKey)
+        {
+            return (_MultiKeys.dumpMultiKey(iMKey));
+        }
+
+        /// <summary>
         /// read the modifiers from registry
         /// </summary>
         /// <returns>a string array with the names of the delta events</returns>
