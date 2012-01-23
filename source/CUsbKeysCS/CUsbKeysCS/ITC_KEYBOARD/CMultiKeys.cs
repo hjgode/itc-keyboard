@@ -95,7 +95,7 @@ namespace ITC_KEYBOARD
         /// <summary>
         /// gives a text dump reprensentation of the multikey
         /// </summary>
-        /// <param name="iIdx">the index of the CUSBkeys.usbKeyStructShort to dump</param>
+        /// <param name="iIdx">the 1-based index of the CUSBkeys.usbKeyStructShort to dump</param>
         /// <returns>a string with the meanings of the structure</returns>
         public string dumpMultiKey(int iIdx)
         {
