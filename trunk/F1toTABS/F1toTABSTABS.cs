@@ -7,11 +7,12 @@ using ITC_KEYBOARD;
 
 namespace F1toTABS
 {
-    class F1toTABSTABS
+    class KeytoTABSTABS
     {
         ITC_KEYBOARD.CUSBkeys _cusbKeys;
+        CUsbKeyTypes.HWkeys[] keysToMap = new CUsbKeyTypes.HWkeys[] { CUsbKeyTypes.HWkeys.Left_Control };
 
-        public F1toTABSTABS()
+        public KeytoTABSTABS()
         {
             _cusbKeys = new CUSBkeys();
         }
@@ -23,8 +24,9 @@ namespace F1toTABS
         /// F3 would send out CONTROLE
         /// F4 would send out CONTROLP
         /// </summary>
-        public void mapF1toTABTABS()
+        public void mapKeytoTABTABS(CUsbKeyTypes.HWkeys KeyToRemap)
         {
+            keysToMap[0] = KeyToRemap;
             createMultiKeys();
         }
 
@@ -34,8 +36,6 @@ namespace F1toTABS
         /// </summary>
         public void createMultiKeys()
         {
-            CUsbKeyTypes.HWkeys[] keysToMap = new CUsbKeyTypes.HWkeys[] { 
-                CUsbKeyTypes.HWkeys.F1 };
             /*
                         
             07,3A,00,42,04,06 'F1' [NoFlag,NoRepeat, NoChord,MultiKeyIndex,] 'F2' 'MultiIndex'->00,00,00,0D 'Tab' | 00,00,00,0D 'Tab' | 00,00,00,0D 'Tab' | 00,00,00,0D 'Tab' | 00,00,00,5A 'Return' |             
