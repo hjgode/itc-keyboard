@@ -14,12 +14,25 @@ namespace F1toTABS
         public Form1()
         {
             InitializeComponent();
+            fillList();
+        }
+
+        void fillList()
+        {
+            comboBox1.Items.Clear();
+            for(int i = 0; i<234; i++){
+                comboBox1.Items.Insert(i, ((ITC_KEYBOARD.CUsbKeyTypes.HWkeys)(i)).ToString());
+            }
+            comboBox1.SelectedIndex = 42;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            F1toTABSTABS mapKeys = new F1toTABSTABS();
-            mapKeys.mapF1toTABTABS();
+            KeytoTABSTABS mapKeys = new KeytoTABSTABS();
+            int i = comboBox1.SelectedIndex;
+            if (i == -1)
+                return;
+            mapKeys.mapKeytoTABTABS((ITC_KEYBOARD.CUsbKeyTypes.HWkeys)i);
         }
 
         private void button2_Click(object sender, EventArgs e)
