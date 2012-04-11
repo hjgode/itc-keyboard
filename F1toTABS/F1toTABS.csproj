@@ -45,10 +45,6 @@
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CUsbKeysCS, Version=1.0.4416.22462, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\source\CUsbKeysCS\CUsbKeysCS\bin\Debug\CUsbKeysCS.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -81,6 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ck3-f1-tabs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\source\CUsbKeysCS\CUsbKeysCS\CUsbKeysCS2008.csproj">
+      <Project>{FB6F4507-EAF7-4CFE-B282-13481C604DFE}</Project>
+      <Name>CUsbKeysCS2008</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CompactFramework.CSharp.targets" />
   <ProjectExtensions>

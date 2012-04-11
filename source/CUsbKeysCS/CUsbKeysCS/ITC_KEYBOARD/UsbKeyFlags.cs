@@ -578,6 +578,13 @@ namespace ITC_KEYBOARD
             Right_Shift = 0xE5,
             Right_Alt = 0xE6,
             Right_GUI = 0xE7,
+            
+            F1_cozumel = 0xEA,
+            F2_cozumel = 0xEB,
+            F3_cozumel = 0xEC,
+            F4_cozumel = 0xED,
+            F5_cozumel = 0xEE,
+
             Aqua_Plane = 0x8B,		/*!< changes the keyboard plane. Aqua and green can be exchanged*/
             Green_Plane = 0xB6,		/*!< changes the keyboard plane to the green/aqua one*/
             Orange_Plane = 0xE9,	/*!< changes the keyboard plane to the orange one*/

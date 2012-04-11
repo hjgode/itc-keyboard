@@ -729,6 +729,15 @@ namespace ITC_KEYBOARD
             new Cusbps2key("F6", 0x07, 0x3F, 0x0B, NORMAL),
             new Cusbps2key("F7", 0x07, 0x40, 0x83, NORMAL),
             new Cusbps2key("F8", 0x07, 0x41, 0x0A, NORMAL),
+            
+            //Cozumel introduces new values!!!!!
+            new Cusbps2key("F1", 0x07, 0xEA, 0x05, NORMAL),
+            new Cusbps2key("F2", 0x07, 0xEB, 0x06, NORMAL),
+            new Cusbps2key("F3", 0x07, 0xEC, 0x04, NORMAL),
+            new Cusbps2key("F4", 0x07, 0xED, 0x0C, NORMAL),
+            new Cusbps2key("F5", 0x07, 0xEE, 0x03, NORMAL),
+            //end of cozumel new values
+
             new Cusbps2key("F9", 0x07, 0x42, 0x01, NORMAL),
             new Cusbps2key("F10", 0x07, 0x43, 0x09, NORMAL),
             new Cusbps2key("F11", 0x07, 0x44, 0x78, NORMAL),

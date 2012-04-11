@@ -20,10 +20,11 @@ namespace F1toTABS
         void fillList()
         {
             comboBox1.Items.Clear();
-            for(int i = 0; i<234; i++){
-                comboBox1.Items.Insert(i, ((ITC_KEYBOARD.CUsbKeyTypes.HWkeys)(i)).ToString());
+            ITC_KEYBOARD.CUsbHwKeys _hwKeys = new ITC_KEYBOARD.CUsbHwKeys();
+            foreach(ITC_KEYBOARD.vkPair p in _hwKeys.vkPairs){
+                comboBox1.Items.Add(p);
             }
-            comboBox1.SelectedIndex = 42;
+            comboBox1.SelectedIndex = 0;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -32,7 +33,8 @@ namespace F1toTABS
             int i = comboBox1.SelectedIndex;
             if (i == -1)
                 return;
-            mapKeys.mapKeytoTABTABS((ITC_KEYBOARD.CUsbKeyTypes.HWkeys)i);
+            ITC_KEYBOARD.vkPair _vkPair = (ITC_KEYBOARD.vkPair)comboBox1.SelectedItem;
+            mapKeys.mapKeytoTABTABS(_vkPair.iVal);
         }
 
         private void button2_Click(object sender, EventArgs e)

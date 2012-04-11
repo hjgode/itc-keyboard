@@ -82,6 +82,7 @@
     <Compile Include="ITC_KEYBOARD\HWkeys\CK3directHWKeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CK3keys-retail.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CK3keys.cs" />
+    <Compile Include="ITC_KEYBOARD\HWkeys\CK71keys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CN3directHWkeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\cn3usbkeys.cs" />
     <Compile Include="ITC_KEYBOARD\HWkeys\CN4directHWkeys.cs" />
