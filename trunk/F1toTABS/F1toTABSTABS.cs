@@ -29,6 +29,11 @@ namespace F1toTABS
             keysToMap[0] = KeyToRemap;
             createMultiKeys();
         }
+        public void mapKeytoTABTABS(int iKeyToRemap)
+        {
+            CUsbKeyTypes.HWkeys hwKey = (CUsbKeyTypes.HWkeys)iKeyToRemap;
+            mapKeytoTABTABS(hwKey);
+        }
 
         /// <summary>
         /// create multikey entries with Ctrl + Letters

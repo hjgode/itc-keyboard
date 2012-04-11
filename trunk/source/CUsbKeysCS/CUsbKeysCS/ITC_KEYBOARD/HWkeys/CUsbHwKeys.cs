@@ -45,6 +45,11 @@ namespace ITC_KEYBOARD
                 else
                     _vkPairs = ck3Keys.vkPairs;
             }
+            else if (sPlatform.StartsWith("CK71"))
+            {
+                string s = ITC_Tools.getModelNumber();
+                _vkPairs = ck70Keys.vkPairs;
+            }
             else
             { //use generic table
                 _vkPairs = cn3Keys.vkPairs;
