@@ -8,7 +8,7 @@ namespace ITC_KEYBOARD
 {
     public partial class CUsbHwKeys
     {
-        private static class ck70Keys
+        public static class ck70Keys
         {
             public static vkPair[] vkPairs = new vkPair[]{
                 new vkPair ( 0x04, "a" ), //"VK_A"
@@ -57,24 +57,31 @@ namespace ITC_KEYBOARD
                 /*
                  * Normally, USB HID values are used, but the CK71 uses different values for function keys !!!!!
                  * 
-                    07,EC,00,00,00,04 'n/a' [NoFlag,NoFlag,NormalKey,] 'F3'
-                    07,ED,00,00,00,0C 'n/a' [NoFlag,NoFlag,NormalKey,] 'F4'
-                    07,EE,00,00,00,03 'n/a' [NoFlag,NoFlag,NormalKey,] 'F5'
-                    07,3F,00,02,00,0B 'F6' [NoFlag,NoRepeat,NormalKey,] 'F6'
-                    07,40,00,02,00,83 'F7' [NoFlag,NoRepeat,NormalKey,] 'F7'
-                    07,EA,00,00,00,05 'n/a' [NoFlag,NoFlag,NormalKey,] 'F1'
-                    07,EB,00,00,00,06 'n/a' [NoFlag,NoFlag,NormalKey,] 'F2'
-                    07,43,00,0A,10,C1 'F10' [NoFlag,NoRepeat, VKEY,AppLaunchKey,] 'VK_APP1' 'AppLaunch'
-                    07,91,00,02,02,01 'Keyboard Lang 2' [NoFlag,NoRepeat,NamedEventIndex,] 'F9' 'EventIndex'|'StateLeftScan'|'DeltaLeftScan
-                    07,90,00,02,02,01 'Keyboard Lang 1 (<SCAN>)' [NoFlag,NoRepeat,NamedEventIndex,] 'F9' 'EventIndex'|'StateLeftScan'|'DeltaLeftScan
-                    0C,E9,00,02,01,01 'Orange Plane' [NoFlag,NoRepeat,ShiftKeyIndex,] 'F9' 'ShiftIndex'->01,02,24,01 'F9' | 
-                    07,8B,00,02,01,02 'Aqua Plane' [NoFlag,NoRepeat,ShiftKeyIndex,] 'n/a' 'ShiftIndex'->01,02,44,02 'n/a' | 
+                    07,EA,00,00,00,05 'F1' [NoFlag,NoFlag,NormalKey,] 'F1'
+                    07,EB,00,00,00,06 'F2' [NoFlag,NoFlag,NormalKey,] 'F2'
+                    07,EC,00,00,00,04 'F3' [NoFlag,NoFlag,NormalKey,] 'F3'
+                    07,ED,00,00,00,0C 'F4' [NoFlag,NoFlag,NormalKey,] 'F4'
+                    07,EE,00,00,00,03 'F5' [NoFlag,NoFlag,NormalKey,] 'F5'
+                    07,EF,00,00,00,0B 'n/a' [NoFlag,NoFlag,NormalKey,] 'F6'
+                    07,F0,00,00,00,83 'n/a' [NoFlag,NoFlag,NormalKey,] 'F7'
+                    07,F1,00,00,00,0A 'n/a' [NoFlag,NoFlag,NormalKey,] 'F8'
+                    07,F2,00,00,00,01 'n/a' [NoFlag,NoFlag,NormalKey,] 'F9'
+                    07,F3,00,00,00,09 'n/a' [NoFlag,NoFlag,NormalKey,] 'F10'
+                    07,F4,00,00,00,78 'n/a' [NoFlag,NoFlag,NormalKey,] 'F11'
+                    07,F5,00,00,00,07 'n/a' [NoFlag,NoFlag,NormalKey,] 'F12'
                 */
                 new vkPair ( 0xEA, "F1 (Soft1)" ), //"VK_F1"
                 new vkPair ( 0xEB, "F2 (Soft2)" ), //"VK_F2"
                 new vkPair ( 0xEC, "F3 (Send)" ), //"VK_F3"
-                new vkPair ( 0xED, "F4 (Send)" ), //"VK_F4"
-                new vkPair ( 0xEE, "F5 (Send)" ), //"VK_F5"
+                new vkPair ( 0xED, "F4 (End)" ), //"VK_F4"
+                new vkPair ( 0xEE, "F5" ), //"VK_F5"
+                new vkPair ( 0xEF, "F6 (VolUp)" ), //"VK_F6"
+                new vkPair ( 0xF0, "F7 (VolDn)" ), //"VK_F7"
+                new vkPair ( 0xF1, "F8" ), //"VK_F8"
+                new vkPair ( 0xF2, "F9" ), //"VK_F9"
+                new vkPair ( 0xF3, "F10" ), //"VK_F10"
+                new vkPair ( 0xF4, "F11" ), //"VK_F11"
+                new vkPair ( 0xF5, "F12" ), //"VK_F12"
                 
                 new vkPair ( 0x3D, "END" ), //F4 added for compatibility
                 new vkPair ( 0x3F, "upper right side button" ),
