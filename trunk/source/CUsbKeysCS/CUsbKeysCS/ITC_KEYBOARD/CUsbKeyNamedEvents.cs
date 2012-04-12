@@ -332,8 +332,31 @@ namespace ITC_KEYBOARD
 		/// </returns>
         public int addNamedEvent(string sState, string sDelta)
         {
-            string sRegEventsState = getRegLocation() + @"\Events\State";
-            string sRegEventsDelta = getRegLocation() + @"\Events\Delta";
+            bool isCN50 = false;
+            try
+            {
+                string sPlatformModel = "";
+                Microsoft.Win32.RegistryKey regPlatform = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("Platform");
+                sPlatformModel = (string)regPlatform.GetValue("Model");
+                if (sPlatformModel == "CN50")
+                    isCN50 = true;
+            }
+            catch
+            {
+            }
+
+            string sRegEventsState;
+            string sRegEventsDelta;
+            if (!isCN50)
+            {
+                sRegEventsState = getRegLocation() + @"\Events\State";
+                sRegEventsDelta = getRegLocation() + @"\Events\Delta";
+            }
+            else
+            {
+                sRegEventsState = @"HARDWARE\DEVICEMAP\KEYBD" + @"\Events\State";
+                sRegEventsDelta = @"HARDWARE\DEVICEMAP\KEYBD" + @"\Events\Delta";
+            }
 
             //the events are below this in branches called Events\State and Events\Delta
             int iNewEventCount = this.getEventCount() + 1;
