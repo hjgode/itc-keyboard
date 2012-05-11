@@ -209,8 +209,6 @@ namespace ITC_KEYBOARD
         /// <returns>the number of MultiKeys</returns>
         public int getMultiKeyCount()
         {
-            if (this._multiKeyCount != 0)
-                return this._multiKeyCount;
             string regKeyb = CUSBkeys.getRegLocation() + @"\MultiKeys";
             Microsoft.Win32.RegistryKey tempKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(regKeyb, true);
             int i = 1;
