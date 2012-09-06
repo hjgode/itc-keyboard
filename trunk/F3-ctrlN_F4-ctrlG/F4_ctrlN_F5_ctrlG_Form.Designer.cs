@@ -1,6 +1,6 @@
 ﻿namespace F4_ctrlN_F5_ctrlG
 {
-    partial class Form1
+    partial class F4_ctrlN_F5_ctrlG_Form
     {
         /// <summary>
         /// Required designer variable.
