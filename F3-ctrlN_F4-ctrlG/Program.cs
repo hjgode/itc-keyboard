@@ -31,7 +31,7 @@ namespace F4_ctrlN_F5_ctrlG
             {
                 mapKeys();
             }
-            Application.Run(new Form1());
+            Application.Run(new F4_ctrlN_F5_ctrlG_Form());
         }
         static void mapKeys()
         {
