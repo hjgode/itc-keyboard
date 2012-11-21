@@ -26,9 +26,11 @@ namespace MapVol2Page
                 CUSBkeys.usbKeyStruct uKeyVolDn = new CUSBkeys.usbKeyStruct();
                 CUSBkeys.usbKeyStruct uKeyVolUp = new CUSBkeys.usbKeyStruct();
 
+                cPlanes.plane plane = cPlanes.plane.green;
+
                 addLog("Reading key mappings");
-                _cusbKeys.getKeyStruct((int)cPlanes.plane.orange, CUsbKeyTypes.HWkeys.F7_VOL_DN, ref uKeyVolDn);
-                _cusbKeys.getKeyStruct((int)cPlanes.plane.orange, CUsbKeyTypes.HWkeys.F6_VOL_UP, ref uKeyVolUp);
+                _cusbKeys.getKeyStruct((int)plane, CUsbKeyTypes.HWkeys.F7_VOL_DN, ref uKeyVolDn);
+                _cusbKeys.getKeyStruct((int)plane, CUsbKeyTypes.HWkeys.F6_VOL_UP, ref uKeyVolUp);
                 
                 addLog("Changing key structs");
                 uKeyVolDn.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
@@ -42,9 +44,9 @@ namespace MapVol2Page
                 uKeyVolUp.bIntScan = (byte)ITC_KEYBOARD.VKEY.VK_PRIOR;
 
                 int iRes = 0;
-                iRes = _cusbKeys.setKey(cPlanes.plane.orange, (int)CUsbKeyTypes.HWkeys.F7_VOL_DN, uKeyVolDn);
+                iRes = _cusbKeys.setKey(plane, (int)CUsbKeyTypes.HWkeys.F7_VOL_DN, uKeyVolDn);
                 addLog("changing key mapping for VolDown="+iRes);
-                iRes = _cusbKeys.setKey(cPlanes.plane.orange, (int)CUsbKeyTypes.HWkeys.F6_VOL_UP, uKeyVolUp);
+                iRes = _cusbKeys.setKey(plane, (int)CUsbKeyTypes.HWkeys.F6_VOL_UP, uKeyVolUp);
                 addLog("changing key mapping for VolUp=" + iRes);
 
                 iRes = _cusbKeys.writeKeyTables();
