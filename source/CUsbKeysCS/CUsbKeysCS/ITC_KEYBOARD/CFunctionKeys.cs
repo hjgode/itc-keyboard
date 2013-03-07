@@ -73,7 +73,7 @@ namespace ITC_KEYBOARD
         {
             public string DllName; /*!< the DLL name the function key is linked to*/
             public string DllFunction; /*!< the function inside the DLL the functionkey is linked to*/
-            public UInt16 functionKeyFlag; /*!< additional optional DWORD flag for the DLL function linked to*/
+            public UInt32 functionKeyFlag; /*!< additional optional DWORD flag for the DLL function linked to*/
         }
 
         /// <summary>
@@ -164,10 +164,19 @@ namespace ITC_KEYBOARD
             }
             for (int i = 1; i <= iCount; i++)
             {
-                UInt16 u16 = (UInt16)tempKey.GetValue("FunctionKey" + i.ToString()+"Flags");
-                _FunctionkeyStructs[i - 1].functionKeyFlag = u16;
-
-                _functionkeyList.Add(_FunctionkeyStructs[i - 1]);
+                object oDWORD = tempKey.GetValue("FunctionKey" + i.ToString() + "Flags");
+                UInt32 u32=0;
+                try
+                {
+                    u32 = Convert.ToUInt32(oDWORD);
+                    //u32 = (UInt32)tempKey.GetValue("FunctionKey" + i.ToString() + "Flags");   //casting gives exception
+                    _FunctionkeyStructs[i - 1].functionKeyFlag = u32;
+                    _functionkeyList.Add(_FunctionkeyStructs[i - 1]);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("FunctionKeys:ReadAll() Exception: " + ex.Message + " for FunctionKey" + i.ToString() + "Flags");
+                }
             }
 
             tempKey.Close();
