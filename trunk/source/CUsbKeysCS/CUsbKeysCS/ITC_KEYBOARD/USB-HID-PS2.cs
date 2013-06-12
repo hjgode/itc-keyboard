@@ -249,9 +249,9 @@ namespace ITC_KEYBOARD
             F1 = 0x0005,
             F2 = 0x0006,
             F12 = 0x0007,
-            upper_left_side = 0x0009,	//F10
+            F10 = 0x0009,	//F10, upper_left_side
             F8 = 0x000A,
-            upper_right_side = 0x000B,	//F6,
+            F6 = 0x000B,	//upper right side,
             F4 = 0x000C,
             Tab = 0x000D,
             lquote = 0x000E,
@@ -349,7 +349,7 @@ namespace ITC_KEYBOARD
             Keypad_3 = 0x007A,
             Keypad_9 = 0x007D,
             Scroll_Lock = 0x007E,
-            lower_right_side = 0x0083,	//F7
+            F7 = 0x0083,	//lower_right_side, F7
             POST_Fail = 0x00FC,
             Pause = 0x1000,
             No_Event = 0xa000,
