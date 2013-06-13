@@ -71,6 +71,8 @@ namespace MapFKey2CtrlFKey
                 CUsbKeyTypes.HWkeys.l,
                 CUsbKeyTypes.HWkeys.m,
                 CUsbKeyTypes.HWkeys.p,
+                CUsbKeyTypes.HWkeys.q,
+                CUsbKeyTypes.HWkeys.r,
             };
 #else
             keysToMap = new CUsbKeyTypes.HWkeys[] {
@@ -161,30 +163,6 @@ namespace MapFKey2CtrlFKey
             ITC_KEYBOARD.CModifiersKeys _cModis = new CModifiersKeys();
             int iModiCtrlIndex = findCtrlModifier();
             
-            #region obsolete
-            //create a key struct that points to the ctrl key modifier entry
-            //uKey[0].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            //uKey[0].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            //uKey[0].bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
-            //uKey[0].bIntScan = (byte)iModiCtrlIndex;  //point to modifier index of CTRL key
-
-            ////map to n
-            //uKey[1].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            //uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            //uKey[1].bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
-            //uKey[1].bIntScan = (byte)ITC_KEYBOARD.PS2KEYS.N;  //point to N key
-
-            ////try to find existing MultiKey
-            //CMultiKeys cmulti = new CMultiKeys();
-            //int iMax = cmulti.getMultiKeyCount();
-            //int iFoundCtrlN = cmulti.findMultiKey(uKey);
-            //if (iFoundCtrlN == -1)//if there was no existing entry, create a new one
-            //{
-            //    iFoundCtrlN = cmulti.addMultiKey(uKey);
-            //}
-            #endregion
-
-            int[] iMapArray = new int[10];
             //create a list of PS2 keys for F1 to Fxx
             ITC_KEYBOARD.PS2KEYS[] ps2KeysToMap =new PS2KEYS[] { 
                 PS2KEYS.F1,
@@ -200,6 +178,9 @@ namespace MapFKey2CtrlFKey
                 PS2KEYS.F11,
                 PS2KEYS.F12,
             };
+            
+            int[] iMapArray = new int[keysToMap.Length];
+
             //map all keys found in keysToMap array
             for (int i = 0; i < keysToMap.Length; i++)
             {
@@ -211,40 +192,6 @@ namespace MapFKey2CtrlFKey
 #endif
             }
 
-            //create another multikey entry for Ctrl+G
-            //create a key struct that points to the ctrl key modifier entry
-            #region obsolete
-            //uKey[0].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            //uKey[0].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            //uKey[0].bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
-            //uKey[0].bIntScan = (byte)iModiCtrlIndex;  //point to modifier index
-            ////map to g
-            //uKey[1].bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
-            //uKey[1].bFlagMid = CUsbKeyTypes.usbFlagsMid.NoFlag;
-            //uKey[1].bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
-            //uKey[1].bIntScan = (byte)ITC_KEYBOARD.PS2KEYS.G;  //point to G key
-            ////is this already known?
-            //int iFoundCtrlG = cmulti.findMultiKey(uKey);
-            //if (iFoundCtrlG == -1)//if there was no existing entry, create a new one
-            //{
-            //    iFoundCtrlG = cmulti.addMultiKey(uKey);
-            //}
-
-            //now map the key(s) in question to the new/existing MultiKeyEntry in all planes
-            //CUSBkeys.usbKeyStruct remapKey = new CUSBkeys.usbKeyStruct();
-            #endregion
-
-            //############### map 2 key #####################
-            //map F1 key in plane x to new multikey
-#if DEBUG
-            //keysToMap[0] = CUsbKeyTypes.HWkeys.g;
-            //keysToMap[1] = CUsbKeyTypes.HWkeys.h;
-            //setKeyToMultiKey((int)keysToMap[0], (byte)(iFoundCtrlN), cPlanes.plane.green);
-            //setKeyToMultiKey((int)keysToMap[1], (byte)(iFoundCtrlG), cPlanes.plane.green);
-#else
-            //setKeyToMultiKey((int)keysToMap[0], (byte)(iFoundCtrlN), cPlanes.plane.normal);
-            //setKeyToMultiKey((int)keysToMap[1], (byte)(iFoundCtrlG), cPlanes.plane.normal);
-#endif
             //save and update
             _cusbKeys.writeKeyTables();
         }
