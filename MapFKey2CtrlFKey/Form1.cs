@@ -84,6 +84,8 @@ namespace MapFKey2CtrlFKey
                 CUsbKeyTypes.HWkeys.F8,
                 CUsbKeyTypes.HWkeys.F9,
                 CUsbKeyTypes.HWkeys.F10,
+                CUsbKeyTypes.HWkeys.F11,
+                CUsbKeyTypes.HWkeys.F12,
             };
 #endif
             createMultiKeys();
@@ -183,6 +185,7 @@ namespace MapFKey2CtrlFKey
             #endregion
 
             int[] iMapArray = new int[10];
+            //create a list of PS2 keys for F1 to Fxx
             ITC_KEYBOARD.PS2KEYS[] ps2KeysToMap =new PS2KEYS[] { 
                 PS2KEYS.F1,
                 PS2KEYS.F2,
@@ -194,8 +197,11 @@ namespace MapFKey2CtrlFKey
                 PS2KEYS.F8,
                 PS2KEYS.F9,
                 PS2KEYS.F10,
+                PS2KEYS.F11,
+                PS2KEYS.F12,
             };
-            for (int i = 0; i < 10; i++)
+            //map all keys found in keysToMap array
+            for (int i = 0; i < keysToMap.Length; i++)
             {
                 iMapArray[i] = getMultiKeyIndexForFKey(ps2KeysToMap[i], iModiCtrlIndex);
 #if ALPHA_NUM
