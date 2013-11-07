@@ -81,13 +81,13 @@ namespace MapFKey2CtrlFKey
                 CUsbKeyTypes.HWkeys.F3_cozumel,
                 CUsbKeyTypes.HWkeys.F4_cozumel,
                 CUsbKeyTypes.HWkeys.F5_cozumel,
-                CUsbKeyTypes.HWkeys.F6_VOL_UP,
-                CUsbKeyTypes.HWkeys.F7_VOL_DN,
-                CUsbKeyTypes.HWkeys.F8,
-                CUsbKeyTypes.HWkeys.F9,
-                CUsbKeyTypes.HWkeys.F10,
-                CUsbKeyTypes.HWkeys.F11,
-                CUsbKeyTypes.HWkeys.F12,
+                CUsbKeyTypes.HWkeys.F6_cozumel,
+                CUsbKeyTypes.HWkeys.F7_cozumel,
+                CUsbKeyTypes.HWkeys.F8_cozumel,
+                CUsbKeyTypes.HWkeys.F9_cozumel,
+                CUsbKeyTypes.HWkeys.F10_cozumel,
+                CUsbKeyTypes.HWkeys.F11_cozumel,
+                CUsbKeyTypes.HWkeys.F12_cozumel,
             };
 #endif
             createMultiKeys();
