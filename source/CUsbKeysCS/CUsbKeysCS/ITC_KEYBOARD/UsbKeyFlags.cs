@@ -345,11 +345,12 @@ namespace ITC_KEYBOARD
                     return false;
             }
         }
-	/*! \namespace ITC_KEYBOARD
-	    \class CUsbKeyTypes#HWkeys
-	    \enum HWkeys
-	    \brief This list of byte values provides the known USB hardware scancodes
-	*/
+        /*! \namespace ITC_KEYBOARD
+            \class CUsbKeyTypes#HWkeys
+            \enum HWkeys
+            \brief This list of byte values provides the known USB hardware scancodes
+         * see HUT (Hardware USB Usage Table) Hut1_12v2.pdf
+        */
         public enum HWkeys : byte
         {
             System_Power = 0x81,
@@ -578,12 +579,32 @@ namespace ITC_KEYBOARD
             Right_Shift = 0xE5,
             Right_Alt = 0xE6,
             Right_GUI = 0xE7,
-            
+            /*
+            07,EA,00,00,00,05 'F1' [NoFlag,NoFlag,NormalKey,] 'F1'
+            07,EB,00,00,00,06 'F2' [NoFlag,NoFlag,NormalKey,] 'F2'
+            07,EC,00,00,00,04 'F3' [NoFlag,NoFlag,NormalKey,] 'F3'
+            07,ED,00,00,00,0C 'F4' [NoFlag,NoFlag,NormalKey,] 'F4'
+            07,EE,00,00,00,03 'F5' [NoFlag,NoFlag,NormalKey,] 'F5'
+            07,EF,00,00,00,0B 'n/a' [NoFlag,NoFlag,NormalKey,] 'F6'
+            07,F0,00,00,00,83 'n/a' [NoFlag,NoFlag,NormalKey,] 'F7'
+            07,F1,00,00,00,0A 'n/a' [NoFlag,NoFlag,NormalKey,] 'F8'
+            07,F2,00,00,00,01 'n/a' [NoFlag,NoFlag,NormalKey,] 'F9'
+            07,F3,00,00,00,09 'n/a' [NoFlag,NoFlag,NormalKey,] 'F10'
+            07,F4,00,00,00,78 'n/a' [NoFlag,NoFlag,NormalKey,] 'F11'
+            07,F5,00,00,00,07 'n/a' [NoFlag,NoFlag,NormalKey,] 'F12'
+            */    
             F1_cozumel = 0xEA,
             F2_cozumel = 0xEB,
             F3_cozumel = 0xEC,
             F4_cozumel = 0xED,
             F5_cozumel = 0xEE,
+            F6_cozumel = 0xEF,
+            F7_cozumel = 0xF0,
+            F8_cozumel = 0xF1,
+            F9_cozumel = 0xF2,
+            F10_cozumel = 0xF3,
+            F11_cozumel = 0xF4,
+            F12_cozumel = 0xF5,
 
             Aqua_Plane = 0x8B,		/*!< changes the keyboard plane. Aqua and green can be exchanged*/
             Green_Plane = 0xB6,		/*!< changes the keyboard plane to the green/aqua one*/
