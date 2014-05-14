@@ -10,21 +10,31 @@ namespace Orange2Ctrl
     class mapKeyOrange
     {
         CUSBkeys cusb = new CUSBkeys();
-        public int mapKeyOrange2Ctrl()
+        public int mapKeyOrange2Ctrl(bool bSticky)
         {
             CUSBkeys.usbKeyStruct key=new CUSBkeys.usbKeyStruct();
             int iRes2 = -1;
             int iRes1 = cusb.getKeyStruct((int)cPlanes.plane.normal, CUsbKeyTypes.HWkeys.Orange_Plane, ref key);
-            if (iRes1 == 0)
+            if (iRes1 != -1)
             {
-                int iModiCtrlIndex = findCtrlModifier();
-                key.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce | CUsbKeyTypes.usbFlagsHigh.LED1;
-                key.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
-                key.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
-                key.bIntScan = (byte)iModiCtrlIndex;
-
+                if (bSticky)
+                {
+                    //find the index of the Ctrl modifier in the modifier list
+                    int iModiCtrlIndex = findCtrlModifier();
+                    key.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.StickyOnce | CUsbKeyTypes.usbFlagsHigh.LED2;
+                    key.bFlagMid = CUsbKeyTypes.usbFlagsMid.NoRepeat;
+                    key.bFlagLow = CUsbKeyTypes.usbFlagsLow.ModifierIndex;
+                    key.bIntScan = (byte)iModiCtrlIndex;
+                }
+                else
+                {
+                    key.bFlagHigh = CUsbKeyTypes.usbFlagsHigh.NoFlag;
+                    key.bFlagMid = CUsbKeyTypes.usbFlagsMid.VKEY;
+                    key.bFlagLow = CUsbKeyTypes.usbFlagsLow.NormalKey;
+                    key.bIntScan = (byte)VKEY.VK_CONTROL;
+                }
                 iRes2 = cusb.setKey((int)cPlanes.plane.normal, CUsbKeyTypes.HWkeys.Orange_Plane, key);
-                if (iRes2 == 0)
+                if (iRes2 != -1)
                     iRes2 = cusb.writeKeyTables();
                 else
                     iRes1 = -1;
@@ -32,6 +42,13 @@ namespace Orange2Ctrl
             return iRes1;
 
         }
+
+        public int restoreDefault()
+        {
+            int iRes = cusb.resetKeyDefaults();
+            return iRes;
+        }
+
         /// <summary>
         /// find the Modifiers Entry for the "Control Key"
         /// creates a new Modifier Entry if no entry is found
