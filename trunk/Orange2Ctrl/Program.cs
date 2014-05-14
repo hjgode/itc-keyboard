@@ -11,9 +11,31 @@ namespace Orange2Ctrl
         /// The main entry point for the application.
         /// </summary>
         [MTAThread]
-        static void Main()
+        static void Main(String[] args)
         {
-            Application.Run(new Form1());
+            bool bAutoClose = true;
+            bool bStickyCtrl = false;
+            if (args.Length > 0)
+            {
+                if(args.Contains<String>("noautoclose"))
+                    bAutoClose = ! testOption("noautoclose", ref args);
+                if (args.Contains<String>("sticky"))
+                    bStickyCtrl = testOption("sticky", ref args);
+
+                Application.Run(new Orange2Ctrl(bAutoClose, bStickyCtrl));
+            }
+            else
+            {
+                Application.Run(new Orange2Ctrl(bAutoClose, bStickyCtrl));
+            }
+        }
+
+        static bool testOption(String opt, ref String[] args)
+        {
+            bool bRet = false;
+            if (args.Contains<String>(opt))
+                bRet = true;
+            return bRet;
         }
     }
 }
