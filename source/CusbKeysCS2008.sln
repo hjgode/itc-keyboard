@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapFKey2CtrlFKey", "..\MapF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange2Ctrl", "..\Orange2Ctrl\Orange2Ctrl.csproj", "{FE260AB9-DAEC-47FB-8203-7A6EFFE62DA2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "F5-F8_to_CtrlK-CtrlB", "..\F5-F8_to_CtrlK-CtrlB\F5-F8_to_CtrlK-CtrlB.csproj", "{403F6140-EB80-44B2-905A-76E9CB0CD7D3}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -92,8 +94,12 @@ Global
 		{FE260AB9-DAEC-47FB-8203-7A6EFFE62DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE260AB9-DAEC-47FB-8203-7A6EFFE62DA2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{FE260AB9-DAEC-47FB-8203-7A6EFFE62DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE260AB9-DAEC-47FB-8203-7A6EFFE62DA2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE260AB9-DAEC-47FB-8203-7A6EFFE62DA2}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{403F6140-EB80-44B2-905A-76E9CB0CD7D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{403F6140-EB80-44B2-905A-76E9CB0CD7D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{403F6140-EB80-44B2-905A-76E9CB0CD7D3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{403F6140-EB80-44B2-905A-76E9CB0CD7D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{403F6140-EB80-44B2-905A-76E9CB0CD7D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{403F6140-EB80-44B2-905A-76E9CB0CD7D3}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
